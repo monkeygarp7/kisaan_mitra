@@ -258,7 +258,7 @@ function Home() {
 
         <div className="logo">
           <Leaf size={24} />
-          <span>CropCare</span>
+          <span>KisaanMitra</span>
         </div>
 
         <p>
