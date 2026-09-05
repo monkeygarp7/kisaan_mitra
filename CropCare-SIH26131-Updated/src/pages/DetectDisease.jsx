@@ -102,7 +102,7 @@ function DetectDisease() {
           <div className="camera-frame">
             {!preview ? (
               <>
-              <>
+            
                 <video ref={videoRef} className="live-camera" autoPlay playsInline muted />
                 
                 {/* NEW: Adorable Floating Leaf Loading Screen */}
