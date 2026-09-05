@@ -58,16 +58,7 @@ function Result() {
               <div className="progress-fill" style={{ width: `${data.confidence || 0}%` }}></div>
             </div>
           </div>
-          <div className="result-info">
-            <div>
-              <span>Crop</span>
-              <strong>{data.crop || "Tomato"}</strong>
-            </div>
-            <div>
-              <span>Location</span>
-              <strong>{data.location || "Maharashtra"}</strong>
-            </div>
-          </div>
+         
           <div className="symptoms">
             <h3>Common Symptoms</h3>
             <ul>
