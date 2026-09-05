@@ -11,7 +11,31 @@ function DetectDisease(){
  const capture=()=>{ const video=videoRef.current,canvas=canvasRef.current; if(!video||!canvas||!cameraReady)return; canvas.width=video.videoWidth||1280; canvas.height=video.videoHeight||720; canvas.getContext("2d").drawImage(video,0,0,canvas.width,canvas.height); setPreview(canvas.toDataURL("image/jpeg",0.9)); };
  const upload=(e)=>{const file=e.target.files?.[0];if(file)setPreview(URL.createObjectURL(file));};
  const retake=()=>{setPreview(null); if(!streamRef.current)startCamera();};
- const analyze=()=>{if(!preview||!crop){alert("Please capture a crop image and select your crop.");return;} navigate("/result",{state:{image:preview,crop,location}});};
+ const analyze = async () => {
+  if (!preview || !crop) {
+    alert("Please capture a crop image and select your crop.");
+    return;
+  }
+
+  try {
+    const response = await fetch(preview);
+    const blob = await response.blob();
+    const formData = new FormData();
+    formData.append("file", blob, "crop.jpg");
+
+    const res = await fetch("http://127.0.0.1:8000/predict", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) throw new Error("Server error");
+
+    const data = await res.json();
+    navigate("/result", { state: { image: preview, crop, location, ...data.prediction } });
+  } catch (err) {
+    alert("Could not reach the AI server. Make sure the backend is running.");
+  }
+};
  return <div className="app-page scan-page">
   <div className="page-heading scan-heading"><p className="small-label">AI CROP DETECTION</p><h1>{t("scan")}</h1><p>{t("allowCamera")}</p></div>
   <div className="scan-camera-layout">
