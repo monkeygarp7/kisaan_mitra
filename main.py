@@ -1,4 +1,8 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File
+import torch
+import torch.nn as nn
+from torchvision import models, transforms
+from PIL import Image
 
 from database import create_tables, get_connection
 
@@ -20,6 +24,61 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Create database tables
 create_tables()
+CLASS_NAMES = [
+    'Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_rust',
+    'Apple___healthy', 'Blueberry___healthy', 'Cherry_(including_sour)___Powdery_mildew',
+    'Cherry_(including_sour)___healthy', 'Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot',
+    'Corn_(maize)___Common_rust_', 'Corn_(maize)___Northern_Leaf_Blight',
+    'Corn_(maize)___healthy', 'Grape___Black_rot', 'Grape___Esca_(Black_Measles)',
+    'Grape___Leaf_blight_(Isariopsis_Leaf_Spot)', 'Grape___healthy',
+    'Orange___Haunglongbing_(Citrus_greening)', 'Peach___Bacterial_spot',
+    'Peach___healthy', 'Pepper,_bell___Bacterial_spot', 'Pepper,_bell___healthy',
+    'Potato___Early_blight', 'Potato___Late_blight', 'Potato___healthy',
+    'Raspberry___healthy', 'Soybean___healthy', 'Squash___Powdery_mildew',
+    'Strawberry___Leaf_scorch', 'Strawberry___healthy', 'Tomato___Bacterial_spot',
+    'Tomato___Early_blight', 'Tomato___Late_blight', 'Tomato___Leaf_Mold',
+    'Tomato___Septoria_leaf_spot', 'Tomato___Spider_mites Two-spotted_spider_mite',
+    'Tomato___Target_Spot', 'Tomato___Tomato_Yellow_Leaf_Curl_Virus',
+    'Tomato___Tomato_mosaic_virus', 'Tomato___healthy'
+]
+
+SYMPTOMS = {
+    'Tomato___Early_blight': ['Dark spots on lower leaves', 'Yellow rings around spots', 'Leaves dry and fall early'],
+    'Tomato___Late_blight': ['Water-soaked lesions on leaves', 'White mold under leaves', 'Rapid browning of stems'],
+    'Tomato___Leaf_Mold': ['Pale green spots on upper leaf', 'Olive-brown mold under leaf', 'Leaves curl and drop'],
+    'Potato___Early_blight': ['Brown circular spots on older leaves', 'Yellowing around lesions', 'Premature leaf drop'],
+    'Potato___Late_blight': ['Dark green water-soaked patches', 'White fuzzy growth under leaves', 'Tubers show brown rot'],
+    'Corn_(maize)___Common_rust_': ['Small reddish-brown pustules on leaves', 'Both leaf surfaces affected', 'Leaves turn yellow then die'],
+    'Apple___Apple_scab': ['Olive-green spots on leaves', 'Scabby lesions on fruit', 'Early leaf drop'],
+}
+
+DEFAULT_SYMPTOMS = [
+    'Unusual discoloration on leaves',
+    'Spots or lesions visible on plant',
+    'Affected areas may spread if untreated'
+]
+
+RECOMMENDATIONS = {
+    'Tomato___Early_blight': 'Apply copper-based fungicide. Remove infected leaves. Avoid overhead watering.',
+    'Tomato___Late_blight': 'Apply mancozeb or chlorothalonil immediately. Remove infected plants.',
+    'Potato___Early_blight': 'Apply fungicide every 7-10 days. Ensure proper plant spacing for airflow.',
+    'Potato___Late_blight': 'Urgent: apply systemic fungicide. Destroy infected plants away from field.',
+    'Corn_(maize)___Common_rust_': 'Apply fungicide if severe. Plant resistant varieties next season.',
+}
+
+transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = models.mobilenet_v2(weights=None)
+model.classifier[1] = nn.Linear(model.last_channel, 38)
+model.load_state_dict(torch.load("crop_disease_model.pth", map_location=device))
+model = model.to(device)
+model.eval()
+print(f"Kisaan Mitra AI model loaded on {device}")
 
 
 @app.get("/")
