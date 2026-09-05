@@ -57,7 +57,7 @@ function Result() {
 
             <div className="confidence-top">
               <span>Detection Confidence</span>
-              <strong>94%</strong>
+              <strong>High (94%)</strong>
             </div>
 
             <div className="progress">
