@@ -1,46 +1,72 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, Phone } from "lucide-react";
+import VoiceInputButton from "../components/VoiceInputButton";
+import { getFarmer } from "../utils/api";
+import { useLanguage } from "../context/LanguageContext";
 
 function Login() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [notice, setNotice] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     if (mobile.length !== 10) {
-      alert("Please enter a valid 10-digit mobile number");
+      alert(t("invalidMobile"));
       return;
     }
 
     if (!password) {
-      alert("Please enter your password");
+      alert(t("emptyPassword"));
       return;
     }
 
     setLoading(true);
+    setNotice("");
 
-    // Demo login
-    setTimeout(() => {
-      localStorage.setItem("cropcare-mobile", mobile);
-      localStorage.setItem("cropcare-username", "Farmer");
+    // The backend has no login/password table yet - it only exposes
+    // farmer records by id. We remember which farmer_id this mobile
+    // number created on THIS device at registration, and use that to
+    // restore the session and refresh live data from the backend.
+    const knownFarmerId = localStorage.getItem(`cropcare-farmer-by-phone-${mobile}`);
 
-      if (rememberMe) {
-        localStorage.setItem("cropcare-login-saved", "true");
-      } else {
-        localStorage.removeItem("cropcare-login-saved");
+    if (knownFarmerId) {
+      try {
+        const farmer = await getFarmer(knownFarmerId);
+        localStorage.setItem("cropcare-farmer-id", String(farmer.id));
+        localStorage.setItem("cropcare-username", farmer.name);
+        localStorage.setItem("cropcare-mobile", farmer.phone);
+        localStorage.setItem("cropcare-village", farmer.village || "");
+        localStorage.setItem("cropcare-crop", farmer.crop || "");
+      } catch {
+        setNotice("Could not reach the server, continuing with saved local details.");
       }
+    } else {
+      localStorage.setItem("cropcare-mobile", mobile);
+      if (!localStorage.getItem("cropcare-username")) {
+        localStorage.setItem("cropcare-username", "Farmer");
+      }
+      setNotice("No account found for this number on this device. You can still continue, or create a new account.");
+    }
 
+    if (rememberMe) {
+      localStorage.setItem("cropcare-login-saved", "true");
+    } else {
+      localStorage.removeItem("cropcare-login-saved");
+    }
+
+    setTimeout(() => {
       setLoading(false);
-
       navigate("/dashboard");
-    }, 700);
+    }, 400);
   };
 
   return (
@@ -51,24 +77,24 @@ function Login() {
         {/* Logo */}
         <div className="auth-logo">
           <Phone size={28} />
-          <span>CropCare</span>
+          <span>Kisaan Mitra</span>
         </div>
 
         {/* Heading */}
         <h2>
-          Farmer Login
+          {t("farmerLogin")}
         </h2>
 
         <p className="auth-subtitle">
-          Login using your mobile number and password
+          {t("loginSubtitle")}
         </p>
 
 
         <form onSubmit={handleLogin}>
 
-          {/* Mobile Number */}
+          {/* {t("mobileNumber")} */}
           <label>
-            Mobile Number
+            {t("mobileNumber")}
           </label>
 
           <div className="input-box">
@@ -77,7 +103,7 @@ function Login() {
 
             <input
               type="tel"
-              placeholder="Enter 10-digit mobile number"
+              placeholder={t("enterMobile")}
               value={mobile}
               onChange={(e) =>
                 setMobile(
@@ -88,12 +114,14 @@ function Login() {
               }
             />
 
+            <VoiceInputButton onResult={setMobile} transform={(text) => text.replace(/\D/g, "").slice(0, 10)} />
+
           </div>
 
 
-          {/* Password */}
+          {/* {t("passwordLabel")} */}
           <label>
-            Password
+            {t("passwordLabel")}
           </label>
 
           <div className="input-box">
@@ -102,7 +130,7 @@ function Login() {
 
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
+              placeholder={t("enterPassword")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -111,7 +139,7 @@ function Login() {
               type="button"
               className="icon-btn"
               onClick={() => setShowPassword(!showPassword)}
-              aria-label="Show or hide password"
+              aria-label={t("showPassword")}
             >
               {showPassword ? (
                 <EyeOff size={19} />
@@ -123,7 +151,7 @@ function Login() {
           </div>
 
 
-          {/* Remember + Forgot Password */}
+          {/* Remember + Forgot {t("passwordLabel")} */}
           <div className="login-options">
 
             <label className="remember">
@@ -135,15 +163,16 @@ function Login() {
                 }
               />
 
-              Remember me
+              {t("rememberMe")}
             </label>
 
             <Link to="/forgot-password">
-              Forgot password?
+              {t("forgotPassword")}
             </Link>
 
           </div>
 
+          {notice && <p className="form-error-note">{notice}</p>}
 
           {/* Login Button */}
           <button
@@ -151,7 +180,7 @@ function Login() {
             className="full-btn"
             disabled={loading}
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? t("loggingIn") : t("login")}
           </button>
 
         </form>
@@ -159,9 +188,9 @@ function Login() {
 
         {/* Register */}
         <p className="auth-bottom">
-          New farmer?{" "}
+          {t("newFarmer")}{" "}
           <Link to="/register">
-            Create an account
+            {t("createAnAccount")}
           </Link>
         </p>
 
