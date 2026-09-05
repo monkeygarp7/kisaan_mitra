@@ -17,6 +17,7 @@ load_dotenv()
 app = FastAPI(
     title="SIH26131 Crop Health Backend"
 )
+
 from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
@@ -26,6 +27,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 UPLOAD_FOLDER = "uploads"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
