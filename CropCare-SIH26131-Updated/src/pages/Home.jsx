@@ -242,14 +242,11 @@ function Home() {
       >
 
         <h2>
-          Built for Maharashtra's Farmers
+          AI-driven disease detection built to make crop health assessment faster, simpler, and more accessible
         </h2>
 
         <p>
-          CropCare aims to help farmers identify
-          crop diseases and pest infestations at
-          an early stage, reducing crop losses and
-          improving agricultural decision-making.
+         Detect early. Understand better. Act smarter. Kisaan Mitra brings AI-powered crop health intelligence to farmers everywhere
         </p>
 
       </section>
