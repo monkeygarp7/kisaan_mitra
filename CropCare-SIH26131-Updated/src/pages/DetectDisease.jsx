@@ -138,22 +138,25 @@ function DetectDisease() {
           
           {cameraError && <div className="camera-error">{cameraError}</div>}
           
-          <div className="camera-controls">
+         {/* NEW: Clean, separated action bar */}
+          <div className="camera-action-bar">
             {!preview ? (
-              <button className="capture-btn leaf-action" onClick={capture} disabled={!cameraReady}>
-                <Camera size={27} />{t("capture")}
+              <button className="smooth-btn capture-mode" onClick={capture} disabled={!cameraReady}>
+                <Camera size={22} /> <span>Capture Photo</span>
               </button>
             ) : (
-              <button className="secondary-btn leaf-action" onClick={retake} disabled={isAnalyzing}>
-                <RotateCcw size={18} />{t("retake")}
+              <button className="smooth-btn retake-mode" onClick={retake} disabled={isAnalyzing}>
+                <RotateCcw size={22} /> <span>Retake Photo</span>
               </button>
             )}
+
+            <div className="divider"></div>
+
+            <label className="smooth-btn upload-mode">
+              <Upload size={20} /> <span>Upload File</span>
+              <input type="file" accept="image/*" onChange={upload} hidden disabled={isAnalyzing} />
+            </label>
           </div>
-          
-          <label className="upload-fallback">
-            <Upload size={16} />{t("uploadFallback")}
-            <input type="file" accept="image/*" onChange={upload} hidden disabled={isAnalyzing} />
-          </label>
           <canvas ref={canvasRef} hidden />
         </section>
 
