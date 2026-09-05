@@ -5,7 +5,7 @@ import { useLanguage } from "../context/LanguageContext";
 
 function DetectDisease(){
  const navigate=useNavigate(); const {t}=useLanguage(); const videoRef=useRef(null); const canvasRef=useRef(null); const streamRef=useRef(null);
- const [preview,setPreview]=useState(null); const [crop,setCrop]=useState(""); const [location,setLocation]=useState(""); const [cameraError,setCameraError]=useState(""); const [cameraReady,setCameraReady]=useState(false);
+const [preview,setPreview]=useState(null); const [cameraError,setCameraError]=useState(""); const [cameraReady,setCameraReady]=useState(false);
  const startCamera=async()=>{ try{ if(!navigator.mediaDevices?.getUserMedia) throw new Error("unsupported"); const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:720}},audio:false}); streamRef.current=stream; if(videoRef.current){videoRef.current.srcObject=stream; await videoRef.current.play();} setCameraReady(true); setCameraError(""); }catch(e){setCameraReady(false);setCameraError(t("cameraError"));} };
  useEffect(()=>{startCamera(); return()=>{streamRef.current?.getTracks().forEach(track=>track.stop());};},[]);
  const capture=()=>{ const video=videoRef.current,canvas=canvasRef.current; if(!video||!canvas||!cameraReady)return; canvas.width=video.videoWidth||1280; canvas.height=video.videoHeight||720; canvas.getContext("2d").drawImage(video,0,0,canvas.width,canvas.height); setPreview(canvas.toDataURL("image/jpeg",0.9)); };
@@ -31,7 +31,7 @@ const analyze = async () => {
     if (!res.ok) throw new Error("Server error");
 
     const data = await res.json();
-    navigate("/result", { state: { image: preview, crop, location, ...data.prediction } });
+  navigate("/result", { state: { image: preview, ...data.prediction } });
   } catch (err) {
     alert("Could not reach the AI server. Make sure the backend is running.");
   }
