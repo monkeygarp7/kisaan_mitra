@@ -48,7 +48,12 @@ const analyze = async () => {
     <label className="upload-fallback"><Upload size={16}/>{t("uploadFallback")}<input type="file" accept="image/*" onChange={upload} hidden/></label>
     <canvas ref={canvasRef} hidden/>
    </section>
-   <section className="details-card scan-details"><div className="scan-secure"><ShieldCheck size={19}/> Camera stays active while this page is open</div><h2>{t("cropType")}</h2><p>Tell us which crop you are scanning for better analysis.</p><label>{t("cropType")}</label><div className="select-box"><Leaf size={19}/><select value={crop} onChange={e=>setCrop(e.target.value)}><option value="">{t("selectCrop")}</option><option>Tomato</option><option>Cotton</option><option>Soybean</option><option>Sugarcane</option><option>Rice</option><option>Wheat</option><option>Other</option></select></div><label>{t("location")}</label><div className="input-box"><MapPin size={19}/><input value={location} onChange={e=>setLocation(e.target.value)} placeholder="Village / District"/></div><button className="full-btn leaf-action" onClick={analyze} disabled={!preview}><ImageIcon size={20}/>{t("analyze")}</button></section>
+  <section className="details-card scan-details">
+  <div className="scan-secure"><ShieldCheck size={19}/> Camera stays active while this page is open</div>
+  <h2>Ready to Scan</h2>
+  <p>Capture or upload a photo of the affected leaf to get started.</p>
+  <button className="full-btn leaf-action" onClick={analyze} disabled={!preview}><ImageIcon size={20}/>{t("analyze")}</button>
+</section>
   </div>
  </div>;
 }
