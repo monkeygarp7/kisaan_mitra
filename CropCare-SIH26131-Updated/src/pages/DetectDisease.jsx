@@ -11,9 +11,9 @@ function DetectDisease(){
  const capture=()=>{ const video=videoRef.current,canvas=canvasRef.current; if(!video||!canvas||!cameraReady)return; canvas.width=video.videoWidth||1280; canvas.height=video.videoHeight||720; canvas.getContext("2d").drawImage(video,0,0,canvas.width,canvas.height); setPreview(canvas.toDataURL("image/jpeg",0.9)); };
  const upload=(e)=>{const file=e.target.files?.[0];if(file)setPreview(URL.createObjectURL(file));};
  const retake=()=>{setPreview(null); if(!streamRef.current)startCamera();};
- const analyze = async () => {
-  if (!preview || !crop) {
-    alert("Please capture a crop image and select your crop.");
+const analyze = async () => {
+  if (!preview) {
+    alert("Please capture a crop image.");
     return;
   }
 
@@ -48,7 +48,7 @@ function DetectDisease(){
     <label className="upload-fallback"><Upload size={16}/>{t("uploadFallback")}<input type="file" accept="image/*" onChange={upload} hidden/></label>
     <canvas ref={canvasRef} hidden/>
    </section>
-   <section className="details-card scan-details"><div className="scan-secure"><ShieldCheck size={19}/> Camera stays active while this page is open</div><h2>{t("cropType")}</h2><p>Tell us which crop you are scanning for better analysis.</p><label>{t("cropType")}</label><div className="select-box"><Leaf size={19}/><select value={crop} onChange={e=>setCrop(e.target.value)}><option value="">{t("selectCrop")}</option><option>Tomato</option><option>Cotton</option><option>Soybean</option><option>Sugarcane</option><option>Rice</option><option>Wheat</option><option>Other</option></select></div><label>{t("location")}</label><div className="input-box"><MapPin size={19}/><input value={location} onChange={e=>setLocation(e.target.value)} placeholder="Village / District"/></div><button className="full-btn leaf-action" onClick={analyze} disabled={!preview||!crop}><ImageIcon size={20}/>{t("analyze")}</button></section>
+   <section className="details-card scan-details"><div className="scan-secure"><ShieldCheck size={19}/> Camera stays active while this page is open</div><h2>{t("cropType")}</h2><p>Tell us which crop you are scanning for better analysis.</p><label>{t("cropType")}</label><div className="select-box"><Leaf size={19}/><select value={crop} onChange={e=>setCrop(e.target.value)}><option value="">{t("selectCrop")}</option><option>Tomato</option><option>Cotton</option><option>Soybean</option><option>Sugarcane</option><option>Rice</option><option>Wheat</option><option>Other</option></select></div><label>{t("location")}</label><div className="input-box"><MapPin size={19}/><input value={location} onChange={e=>setLocation(e.target.value)} placeholder="Village / District"/></div><button className="full-btn leaf-action" onClick={analyze} disabled={!preview}><ImageIcon size={20}/>{t("analyze")}</button></section>
   </div>
  </div>;
 }
