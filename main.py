@@ -243,25 +243,33 @@ async def predict_disease(file: UploadFile = File(...)):
     with open(filepath, "wb") as image:
         image.write(contents)
 
-    # TEMPORARY PREDICTION
-    # Actual AI model will be connected later.
+    # REAL AI PREDICTION
+    image_pil = Image.open(filepath).convert("RGB")
+    tensor = transform(image_pil).unsqueeze(0).to(device)
 
-    disease = "Leaf Blight"
-    confidence = 87.5
-    severity = "Medium"
+    with torch.no_grad():
+        outputs = model(tensor)
+        probabilities = torch.nn.functional.softmax(outputs[0], dim=0)
+        confidence_val, predicted_idx = torch.max(probabilities, 0)
 
-    recommendation = (
-        "Monitor the affected crop and consult "
-        "an agriculture expert for appropriate treatment."
-    )
+    full_class = CLASS_NAMES[predicted_idx.item()]
+    confidence = round(confidence_val.item() * 100, 2)
+    is_healthy = "healthy" in full_class.lower()
+    disease = full_class.split("___")[-1].replace("_", " ")
+    severity = "None" if is_healthy else ("High" if confidence > 85 else "Medium" if confidence > 60 else "Low")
+    symptoms = SYMPTOMS.get(full_class, DEFAULT_SYMPTOMS)
+    recommendation = RECOMMENDATIONS.get(full_class, "Consult an agriculture expert for appropriate treatment.")
 
     return {
         "success": True,
         "image": filename,
         "prediction": {
             "disease": disease,
+            "full_class": full_class,
             "confidence": confidence,
             "severity": severity,
+            "is_healthy": is_healthy,
+            "symptoms": symptoms,
             "recommendation": recommendation
         }
     }
