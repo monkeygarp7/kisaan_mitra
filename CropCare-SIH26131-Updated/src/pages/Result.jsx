@@ -41,62 +41,48 @@ function Result() {
         </div>
 
         {/* Result */}
-
         <div className="result-card">
-
           <div className="result-warning">
-            <AlertTriangle size={25} />
-
+            {data.is_healthy ? <CheckCircle2 size={25} /> : <AlertTriangle size={25} />}
             <div>
-              <span>Possible Disease Detected</span>
-              <h2>Early Blight</h2>
+              <span>{data.is_healthy ? "Plant is Healthy" : "Possible Disease Detected"}</span>
+              <h2>{data.disease || "Analyzing..."}</h2>
             </div>
           </div>
-
           <div className="confidence">
-
             <div className="confidence-top">
               <span>Detection Confidence</span>
-              <strong>High (94%)</strong>
+              <strong>{data.confidence ? `${data.confidence}%` : "N/A"}</strong>
             </div>
-
             <div className="progress">
-              <div className="progress-fill"></div>
+              <div className="progress-fill" style={{ width: `${data.confidence || 0}%` }}></div>
             </div>
-
           </div>
-
           <div className="result-info">
-
             <div>
               <span>Crop</span>
               <strong>{data.crop || "Tomato"}</strong>
             </div>
-
             <div>
               <span>Location</span>
               <strong>{data.location || "Maharashtra"}</strong>
             </div>
-
           </div>
-
           <div className="symptoms">
-
             <h3>Common Symptoms</h3>
-
             <ul>
-              <li>Dark spots appearing on leaves</li>
-              <li>Yellowing around affected areas</li>
-              <li>Leaves may gradually weaken</li>
+              {(data.symptoms && data.symptoms.length > 0
+                ? data.symptoms
+                : ["No specific symptoms data available"]
+              ).map((symptom, index) => (
+                <li key={index}>{symptom}</li>
+              ))}
             </ul>
-
           </div>
-
           <Link to="/advisory" className="primary-btn">
             View Treatment Advice
             <ArrowRight size={18} />
           </Link>
-
         </div>
 
       </div>
