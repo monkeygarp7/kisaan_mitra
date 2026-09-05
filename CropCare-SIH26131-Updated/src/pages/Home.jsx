@@ -25,7 +25,7 @@ function Home() {
 
         <Link to="/" className="logo">
           <Leaf size={30} />
-          <span>KsaanMitra</span>
+          <span>KisaanMitra</span>
         </Link>
 
         <div className="nav-links">
