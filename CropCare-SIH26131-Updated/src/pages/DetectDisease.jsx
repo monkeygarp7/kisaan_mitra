@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Camera, Upload, Image as ImageIcon, RotateCcw, ShieldCheck, Loader2 } from "lucide-react";
+import { Camera, Upload, Image as ImageIcon, RotateCcw, ShieldCheck, Loader2, Leaf } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 
 function DetectDisease() {
@@ -102,7 +102,19 @@ function DetectDisease() {
           <div className="camera-frame">
             {!preview ? (
               <>
+              <>
                 <video ref={videoRef} className="live-camera" autoPlay playsInline muted />
+                
+                {/* NEW: Adorable Floating Leaf Loading Screen */}
+                {!cameraReady && (
+                  <div className="adorable-loading-overlay">
+                    <div className="floating-leaf-container">
+                      <Leaf className="leaf-icon" size={44} strokeWidth={2.5} />
+                    </div>
+                    <span className="cute-loading-text">Waking up camera...</span>
+                  </div>
+                )}
+
                 <div className="camera-corners"><i></i><i></i><i></i><i></i></div>
                 <div className="camera-top-status">
                   <span className={cameraReady ? "camera-dot ready" : "camera-dot"}></span>
