@@ -85,6 +85,18 @@ def create_tables():
             FOREIGN KEY (crop_id) REFERENCES crops(id)
         )
     """)
+        # Agriculture experts / laboratories table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS experts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            specialization TEXT,
+            phone TEXT,
+            email TEXT,
+            location TEXT
+        )
+    """)
+
     # Add missing columns to existing experts table
     expert_columns = [
         ("organization", "TEXT"),
@@ -102,18 +114,6 @@ def create_tables():
             cursor.execute(
                 f"ALTER TABLE experts ADD COLUMN {column_name} {column_type}"
             )
-
-    # Agriculture experts / laboratories table
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS experts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            specialization TEXT,
-            phone TEXT,
-            email TEXT,
-            location TEXT
-        )
-    """)
 
     # Crop health monitoring / follow-up table
     cursor.execute("""
