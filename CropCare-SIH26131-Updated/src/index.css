@@ -1578,3 +1578,73 @@ button, a { -webkit-tap-highlight-color: transparent; }
   animation: pulseGlow 1.5s infinite;
   cursor: not-allowed;
 }
+/* =========================================
+   COOL MOUSE HOVER EFFECTS
+   ========================================= */
+
+/* 1. Holographic Light Sweep for Buttons */
+.leaf-action {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease-out;
+}
+
+/* Creates the invisible light beam */
+.leaf-action::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: skewX(-25deg);
+  transition: left 0.6s ease;
+}
+
+/* Flashes the beam across the button on hover */
+.leaf-action:hover::before {
+  left: 150%;
+}
+
+/* Lifts the button and adds a neon shadow */
+.leaf-action:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(34, 197, 94, 0.4);
+}
+
+/* 2. Camera Card "Lock-On" Effect */
+.camera-card {
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Pops the card out slightly */
+.camera-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 15px 40px rgba(34, 197, 94, 0.15);
+}
+
+/* Makes the camera corners glow green when hovered */
+.camera-card:hover .camera-corners i {
+  border-color: #22c55e;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+  transition: all 0.3s ease;
+}
+
+/* Adds a subtle, cinematic film-grain overlay on hover */
+.camera-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E");
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  z-index: 20;
+  border-radius: inherit;
+}
+
+.camera-card:hover::after {
+  opacity: 1;
+}
