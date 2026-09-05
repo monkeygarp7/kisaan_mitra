@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Camera, FileText, ShieldAlert, Map, UserCheck, Leaf, CloudSun, ArrowRight, User, History } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 function Dashboard(){ const {t}=useLanguage(); const name=localStorage.getItem("cropcare-username")||"Farmer"; return <div className="app-page">
-  <div className="dashboard-top"><div><p className="small-label">FARMER DASHBOARD</p><h1>{t("welcome")}, {name} 👋</h1><p>{t("dashboardSub")}</p></div><WeatherCard /></div>
+  <div className="dashboard-top"><div><p className="small-label">FARMER DASHBOARD</p><h1>{t("welcome")}, {name} 👋</h1><p>{t("dashboardSub")}</p></div></div><WeatherCard />
   <section className="detect-banner"><div><span className="banner-label">AI CROP HEALTH CHECK</span><h2>{t("checkCrop")}</h2><p>Open the live camera, capture your crop and check for possible diseases or pests.</p><Link to="/detect" className="primary-btn"><Camera size={20}/>{t("scan")}<ArrowRight size={18}/></Link></div><div className="banner-icon"><Leaf size={80}/></div></section>
   <div className="dashboard-menu-row"><Link to="/profile" className="dashboard-menu-card"><span className="menu-icon"><User size={23}/></span><div><strong>{t("farmerDetails")}</strong><p>Profile, farm details, crop history and activity</p></div><ArrowRight size={18}/></Link><Link to="/reports" className="dashboard-menu-card"><span className="menu-icon"><History size={23}/></span><div><strong>Farmer History</strong><p>Previous scans, reports and advisories</p></div><ArrowRight size={18}/></Link></div>
   <h2 className="dashboard-heading">{t("quickActions")}</h2><div className="dashboard-grid">
