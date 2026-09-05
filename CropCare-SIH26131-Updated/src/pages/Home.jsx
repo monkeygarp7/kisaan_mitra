@@ -25,7 +25,7 @@ function Home() {
 
         <Link to="/" className="logo">
           <Leaf size={30} />
-          <span>CropCare</span>
+          <span>KsaanMitra</span>
         </Link>
 
         <div className="nav-links">
@@ -242,7 +242,7 @@ function Home() {
       >
 
         <h2>
-          AI-driven disease detection built to make crop health assessment faster, simpler, and more accessible
+         Made for Farmers
         </h2>
 
         <p>
