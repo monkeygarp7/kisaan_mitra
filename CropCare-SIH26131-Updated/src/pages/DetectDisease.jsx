@@ -23,7 +23,7 @@ const analyze = async () => {
     const formData = new FormData();
     formData.append("file", blob, "crop.jpg");
 
-    const res = await fetch("http://127.0.0.1:8000/predict", {
+  const res = await fetch("https://kisaan-mitra-backend.onrender.com/predict", {
       method: "POST",
       body: formData,
     });
