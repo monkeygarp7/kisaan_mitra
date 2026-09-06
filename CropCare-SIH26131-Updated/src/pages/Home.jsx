@@ -19,41 +19,7 @@ function Home() {
   return (
     <div className="home-page">
 
-      {/* ==================== NAVBAR ==================== */}
-
-      <nav className="navbar">
-
-        <Link to="/" className="logo">
-          <Leaf size={30} />
-          <span>KisaanMitra</span>
-        </Link>
-
-        <div className="nav-links">
-
-          <a href="#features">
-            {t("features")}
-          </a>
-
-          <a href="#about">
-            {t("about")}
-          </a>
-
-          <label className="language-select">
-            <span>🌐</span>
-
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              aria-label={t("language")}
-            >
-              <option value="en">{t("languageEnglish")}</option>
-              <option value="hi">{t("languageHindi")}</option>
-              <option value="mr">{t("languageMarathi")}</option>
-            </select>
-          </label>
-
-        </div>
-      </nav>
+    
 
 
       {/* ==================== HERO SECTION ==================== */}
