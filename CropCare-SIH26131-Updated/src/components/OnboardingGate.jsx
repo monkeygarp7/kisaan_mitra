@@ -4,27 +4,20 @@ import { useLanguage } from "../context/LanguageContext";
 
 const ONBOARD_KEY = "cropcare-onboarded";
 
-const LANGUAGES = [
-  { code: "en", label: "English" },
-  { code: "hi", label: "हिन्दी" },
-  { code: "mr", label: "मराठी" },
-];
-
 /**
  * Shown once, the very first time the site is opened on a device.
- * Step 1 - pick a language (also changeable later from the navbar).
- * Step 2 - ask for camera permission up front, so the scan page opens
- *          instantly later instead of prompting mid-task.
+ * Language selection is intentionally NOT shown here because the
+ * existing navbar language selector remains available at all times.
  *
- * This never blocks the app permanently - the farmer can skip camera
- * access and still use image upload later, and can re-pick a language
- * any time from the existing navbar selector.
+ * The onboarding now goes directly to camera permission.
  */
 function OnboardingGate({ children }) {
-  const { language, setLanguage, t } = useLanguage();
-  const [dismissed, setDismissed] = useState(() => localStorage.getItem(ONBOARD_KEY) === "1");
-  const [step, setStep] = useState(1);
-  const [cameraState, setCameraState] = useState("idle"); // idle | asking | granted | denied
+  const { t } = useLanguage();
+  const [dismissed, setDismissed] = useState(
+    () => localStorage.getItem(ONBOARD_KEY) === "1"
+  );
+  const [cameraState, setCameraState] = useState("idle");
+  // idle | asking | granted | denied
 
   const finish = () => {
     localStorage.setItem(ONBOARD_KEY, "1");
@@ -33,9 +26,17 @@ function OnboardingGate({ children }) {
 
   const requestCamera = async () => {
     setCameraState("asking");
+
     try {
-      if (!navigator.mediaDevices?.getUserMedia) throw new Error("unsupported");
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error("Camera is not supported");
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false,
+      });
+
       stream.getTracks().forEach((track) => track.stop());
       setCameraState("granted");
     } catch {
@@ -48,6 +49,7 @@ function OnboardingGate({ children }) {
   return (
     <>
       {children}
+
       <div className="onboard-overlay" role="dialog" aria-modal="true">
         <div className="onboard-card">
           <div className="onboard-logo">
@@ -55,66 +57,51 @@ function OnboardingGate({ children }) {
             <span>Kisaan Mitra</span>
           </div>
 
-          {step === 1 && (
-            <>
-              <h2>{t("chooseLanguage")}</h2>
-              <p>{t("chooseLanguageText")}</p>
-              <div className="onboard-lang-grid">
-                {LANGUAGES.map((lng) => (
-                  <button
-                    key={lng.code}
-                    type="button"
-                    className={language === lng.code ? "onboard-lang-btn active" : "onboard-lang-btn"}
-                    onClick={() => setLanguage(lng.code)}
-                  >
-                    {lng.label}
-                  </button>
-                ))}
-              </div>
-              <button type="button" className="full-btn" onClick={() => setStep(2)}>
-                {t("continue")}
-              </button>
-            </>
+          <div className="onboard-icon">
+            <Camera size={40} />
+          </div>
+
+          <h2>{t("allowCameraTitle")}</h2>
+          <p>{t("allowCameraOnboardText")}</p>
+
+          {cameraState === "granted" && (
+            <div className="onboard-status onboard-status-ok">
+              <CheckCircle2 size={18} />
+              {t("cameraGranted")}
+            </div>
           )}
 
-          {step === 2 && (
+          {cameraState === "denied" && (
+            <div className="onboard-status onboard-status-warn">
+              <ShieldAlert size={18} />
+              {t("cameraDeniedNote")}
+            </div>
+          )}
+
+          {cameraState === "granted" ? (
+            <button type="button" className="full-btn" onClick={finish}>
+              {t("startUsingApp")}
+            </button>
+          ) : (
             <>
-              <div className="onboard-icon">
-                <Camera size={40} />
-              </div>
-              <h2>{t("allowCameraTitle")}</h2>
-              <p>{t("allowCameraOnboardText")}</p>
+              <button
+                type="button"
+                className="full-btn"
+                onClick={requestCamera}
+                disabled={cameraState === "asking"}
+              >
+                {cameraState === "asking"
+                  ? t("requestingCamera")
+                  : t("allowCamera")}
+              </button>
 
-              {cameraState === "granted" && (
-                <div className="onboard-status onboard-status-ok">
-                  <CheckCircle2 size={18} /> {t("cameraGranted")}
-                </div>
-              )}
-              {cameraState === "denied" && (
-                <div className="onboard-status onboard-status-warn">
-                  <ShieldAlert size={18} /> {t("cameraDeniedNote")}
-                </div>
-              )}
-
-              {cameraState === "granted" ? (
-                <button type="button" className="full-btn" onClick={finish}>
-                  {t("startUsingApp")}
-                </button>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    className="full-btn"
-                    onClick={requestCamera}
-                    disabled={cameraState === "asking"}
-                  >
-                    {cameraState === "asking" ? t("requestingCamera") : t("allowCamera")}
-                  </button>
-                  <button type="button" className="onboard-skip" onClick={finish}>
-                    {t("skipForNow")}
-                  </button>
-                </>
-              )}
+              <button
+                type="button"
+                className="onboard-skip"
+                onClick={finish}
+              >
+                {t("skipForNow")}
+              </button>
             </>
           )}
         </div>
