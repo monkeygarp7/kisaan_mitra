@@ -25,7 +25,7 @@ function Home() {
 
         <Link to="/" className="logo">
           <Leaf size={30} />
-          <span>Kisaan Mitra</span>
+          <span>KisaanMitra</span>
         </Link>
 
         <div className="nav-links">
@@ -239,11 +239,11 @@ function Home() {
       >
 
         <h2>
-          {t("aboutFarmers")}
+         Made for Farmers
         </h2>
 
         <p>
-          {t("aboutText")}
+         Detect early. Understand better. Act smarter. Kisaan Mitra brings AI-powered crop health intelligence to farmers everywhere
         </p>
 
       </section>
@@ -255,7 +255,7 @@ function Home() {
 
         <div className="logo">
           <Leaf size={24} />
-          <span>Kisaan Mitra</span>
+          <span>KisaanMitra</span>
         </div>
 
         <p>
