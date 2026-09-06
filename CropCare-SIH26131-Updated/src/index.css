@@ -1579,6 +1579,103 @@ button, a { -webkit-tap-highlight-color: transparent; }
     max-width: 220px;
   }
 }
+.page-content { position: relative; z-index: 1; }
+.app-page, .home-page, .auth-page {
+  position: relative;
+  isolation: isolate;
+}
+.app-page { background: rgba(255,255,240,.94); }
+.auth-page { background: rgba(242,248,243,.96); }
+.farming-motion {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: .72;
+}
+.farming-orb {
+  position: absolute;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(125,190,126,.22), rgba(125,190,126,0) 68%);
+  filter: blur(1px);
+  animation: farmOrb 14s ease-in-out infinite alternate;
+}
+.orb-one { top: 8%; right: 6%; }
+.orb-two { bottom: 8%; left: 3%; animation-delay: -5s; }
+.farm-float { position: absolute; color: rgba(11,110,79,.13); filter: drop-shadow(0 10px 10px rgba(11,110,79,.08)); transform-style: preserve-3d; }
+.farm-leaf-one { width: 68px; left: 4%; top: 22%; animation: farmFloatA 9s ease-in-out infinite; }
+.farm-leaf-two { width: 50px; right: 10%; top: 45%; animation: farmFloatB 11s ease-in-out infinite; }
+.farm-sprout { width: 76px; right: 5%; bottom: 13%; animation: farmFloatC 10s ease-in-out infinite; }
+.farm-wheat { width: 62px; left: 10%; bottom: 8%; animation: farmFloatB 12s ease-in-out infinite reverse; }
+.farm-sun { width: 58px; right: 28%; top: 9%; opacity: .11; animation: farmSpin 22s linear infinite; }
+.farm-cloud { width: 100px; left: 29%; top: 12%; opacity: .08; animation: cloudDrift 18s ease-in-out infinite; }
+.farm-flower { width: 52px; right: 32%; bottom: 16%; animation: farmFloatA 13s ease-in-out infinite reverse; }
+.farm-particle { position:absolute; width:7px; height:7px; border-radius:50%; background:rgba(47,143,70,.22); box-shadow:0 0 18px rgba(47,143,70,.18); animation: particle3d 8s ease-in-out infinite; }
+.particle-one{left:20%;top:30%}.particle-two{left:72%;top:25%;animation-delay:-2s}.particle-three{left:52%;top:72%;animation-delay:-4s}.particle-four{left:85%;top:70%;animation-delay:-6s}.particle-five{left:12%;top:78%;animation-delay:-1s}
+@keyframes farmFloatA { 0%,100%{transform:translate3d(0,0,0) rotate(-9deg) scale(.94)} 50%{transform:translate3d(18px,-24px,28px) rotate(9deg) scale(1.04)} }
+@keyframes farmFloatB { 0%,100%{transform:translate3d(0,0,0) rotate(8deg)} 50%{transform:translate3d(-20px,20px,24px) rotate(-12deg)} }
+@keyframes farmFloatC { 0%,100%{transform:translate3d(0,0,0) rotateY(0deg)} 50%{transform:translate3d(12px,-18px,35px) rotateY(24deg)} }
+@keyframes farmSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes cloudDrift { 0%,100%{transform:translateX(-18px)} 50%{transform:translateX(25px)} }
+@keyframes particle3d { 0%,100%{transform:translate3d(0,0,0) scale(.65);opacity:.2} 50%{transform:translate3d(24px,-35px,30px) scale(1.25);opacity:.75} }
+@keyframes farmOrb { from{transform:translate3d(-10px,0,0) scale(.92)} to{transform:translate3d(25px,-22px,0) scale(1.08)} }
+
+/* Home slogan */
+.national-farming-slogan {
+  display:inline-flex;
+  margin:0 0 18px;
+  padding:8px 15px;
+  border:1px solid rgba(11,110,79,.18);
+  border-radius:999px;
+  background:rgba(255,255,255,.7);
+  color:#0b6e4f;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:2.2px;
+  box-shadow:0 8px 24px rgba(11,110,79,.08);
+  animation:sloganLift 4s ease-in-out infinite;
+}
+@keyframes sloganLift { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+
+/* Scan camera tools */
+.camera-tool-row { position:absolute; top:16px; right:16px; display:flex; gap:8px; z-index:3; }
+.camera-tool { width:42px; height:42px; border:1px solid rgba(255,255,255,.24); border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.42); color:white; backdrop-filter:blur(7px); cursor:pointer; transition:.22s ease; }
+.camera-tool:hover, .camera-tool.active { transform:translateY(-2px) scale(1.05); background:rgba(11,110,79,.8); box-shadow:0 8px 22px rgba(0,0,0,.2); }
+.camera-tool:disabled { opacity:.55; cursor:wait; }
+.camera-zoom-control { position:absolute; left:50%; bottom:54px; transform:translateX(-50%); width:min(330px,72%); display:flex; align-items:center; gap:9px; padding:9px 12px; border-radius:999px; color:white; background:rgba(0,0,0,.42); backdrop-filter:blur(7px); z-index:3; }
+.camera-zoom-control input { flex:1; accent-color:#72b87d; cursor:pointer; }
+.camera-zoom-control span { min-width:38px; font-size:11px; text-align:right; }
+.ai-analysis-card { display:flex; align-items:center; gap:12px; margin:20px 0; padding:13px; border:1px solid #e0e8e1; border-radius:13px; background:linear-gradient(135deg,#f7fbf7,#fff); box-shadow:0 8px 22px rgba(0,0,0,.04); }
+.ai-analysis-icon { width:42px; height:42px; flex:0 0 42px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:#e7f5e9; color:#0b6e4f; animation:icon3d 3.5s ease-in-out infinite; }
+.ai-analysis-card strong,.ai-analysis-card span { display:block; }
+.ai-analysis-card span { margin-top:3px; color:#68736a; font-size:12px; }
+.permission-dot { width:8px; height:8px; border-radius:50%; background:#d68a16; display:inline-block; }
+.location-status-granted .permission-dot { background:#68c879; box-shadow:0 0 0 5px rgba(104,200,121,.13); }
+.result-rescan-btn { margin-top:14px; justify-content:center; }
+@keyframes icon3d { 0%,100%{transform:rotateY(-8deg) translateY(0)} 50%{transform:rotateY(8deg) translateY(-3px)} }
+
+/* Give existing cards a subtle 3D farming feel on hover, without changing their palette. */
+.feature-card, .hero-card, .details-card, .result-card, .result-image-card, .dashboard-card, .dashboard-menu-card, .profile-card, .auth-card { transform-style:preserve-3d; transition:transform .28s ease, box-shadow .28s ease; }
+.feature-card:hover, .hero-card:hover, .details-card:hover, .result-card:hover, .result-image-card:hover, .dashboard-card:hover, .dashboard-menu-card:hover, .profile-card:hover, .auth-card:hover { transform:perspective(900px) translateY(-4px) rotateX(1.2deg) rotateY(-1.2deg); box-shadow:0 18px 42px rgba(11,110,79,.11); }
+
+@media (prefers-reduced-motion: reduce) {
+  .farming-motion *, .national-farming-slogan, .ai-analysis-icon { animation:none !important; }
+  .feature-card, .hero-card, .details-card, .result-card, .result-image-card, .dashboard-card, .dashboard-menu-card, .profile-card, .auth-card { transition:none; }
+}
+
+/* FUTURISTIC 3D FARM ATMOSPHERE */
+.farming-motion { perspective: 1200px; }
+.farm-horizon { position:absolute; left:-10%; right:-10%; bottom:-18%; height:45%; background:radial-gradient(ellipse at center, rgba(11,110,79,.08), transparent 68%); transform:rotateX(68deg) translateZ(-80px); transform-origin:center bottom; animation:horizonPulse 9s ease-in-out infinite; }
+.falling-leaves { position:absolute; inset:0; overflow:hidden; transform-style:preserve-3d; }
+.falling-leaf { position:absolute; top:-8%; color:rgba(11,110,79,.22); filter:drop-shadow(0 5px 7px rgba(11,110,79,.12)); transform-style:preserve-3d; animation:leafFall 13s linear infinite; }
+.leaf-1{left:4%;animation-delay:-2s}.leaf-2{left:11%;animation-delay:-8s}.leaf-3{left:18%;animation-delay:-4s}.leaf-4{left:27%;animation-delay:-11s}.leaf-5{left:34%;animation-delay:-6s}.leaf-6{left:43%;animation-delay:-1s}.leaf-7{left:51%;animation-delay:-9s}.leaf-8{left:59%;animation-delay:-5s}.leaf-9{left:67%;animation-delay:-12s}.leaf-10{left:74%;animation-delay:-3s}.leaf-11{left:81%;animation-delay:-10s}.leaf-12{left:88%;animation-delay:-7s}.leaf-13{left:94%;animation-delay:-1s}.leaf-14{left:24%;animation-delay:-13s}.leaf-15{left:47%;animation-delay:-7s}.leaf-16{left:71%;animation-delay:-4s}.leaf-17{left:84%;animation-delay:-14s}.leaf-18{left:14%;animation-delay:-10s}
+.firefly-field{position:absolute;inset:0;transform-style:preserve-3d}.firefly{position:absolute;width:4px;height:4px;border-radius:50%;background:rgba(108,177,93,.48);box-shadow:0 0 14px rgba(108,177,93,.55);animation:fireflyDrift 6s ease-in-out infinite}.firefly-1{left:8%;top:38%;animation-delay:-1s}.firefly-2{left:16%;top:64%;animation-delay:-3s}.firefly-3{left:31%;top:28%;animation-delay:-5s}.firefly-4{left:39%;top:77%;animation-delay:-2s}.firefly-5{left:54%;top:42%;animation-delay:-4s}.firefly-6{left:63%;top:18%;animation-delay:-1.5s}.firefly-7{left:72%;top:58%;animation-delay:-3.5s}.firefly-8{left:82%;top:34%;animation-delay:-5.5s}.firefly-9{left:91%;top:72%;animation-delay:-2.5s}.firefly-10{left:45%;top:12%;animation-delay:-4.5s}.firefly-11{left:25%;top:50%;animation-delay:-6s}.firefly-12{left:76%;top:82%;animation-delay:-1.2s}
+@keyframes leafFall { 0%{transform:translate3d(0,-12vh,80px) rotateX(10deg) rotateY(0) rotateZ(0);opacity:0} 8%{opacity:.8} 35%{transform:translate3d(55px,34vh,20px) rotateX(120deg) rotateY(80deg) rotateZ(130deg)} 68%{transform:translate3d(-45px,72vh,-20px) rotateX(240deg) rotateY(170deg) rotateZ(250deg)} 100%{transform:translate3d(80px,118vh,-80px) rotateX(360deg) rotateY(300deg) rotateZ(390deg);opacity:0} }
+@keyframes fireflyDrift { 0%,100%{transform:translate3d(0,0,0) scale(.6);opacity:.2} 50%{transform:translate3d(18px,-28px,45px) scale(1.5);opacity:.9} }
+@keyframes horizonPulse { 0%,100%{opacity:.45;transform:rotateX(68deg) translateZ(-80px) scale(.96)} 50%{opacity:.8;transform:rotateX(68deg) translateZ(-55px) scale(1.04)} }
 /* =========================================
    AI LEAF SCANNER ANIMATIONS
    ========================================= */

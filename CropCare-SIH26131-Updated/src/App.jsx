@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "./context/LanguageContext";
 import PageTransition from "./components/PageTransition";
+import OnboardingGate from "./components/OnboardingGate";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -14,9 +15,10 @@ import RiskForecast from "./pages/RiskForecast";
 import HotspotMap from "./pages/HotspotMap";
 import ExpertValidation from "./pages/ExpertValidation";
 import Profile from "./pages/Profile";
+import FarmingMotion from "./components/FarmingMotion";
 
 function App() {
-  return <LanguageProvider><BrowserRouter><PageTransition><Routes>
+  return <LanguageProvider><OnboardingGate><BrowserRouter><PageTransition><FarmingMotion /><Routes>
     <Route path="/" element={<Home />} />
     <Route path="/login" element={<Login />} />
     <Route path="/register" element={<Register />} />
@@ -30,6 +32,6 @@ function App() {
     <Route path="/map" element={<HotspotMap />} />
     <Route path="/expert" element={<ExpertValidation />} />
     <Route path="/profile" element={<Profile />} />
-  </Routes></PageTransition></BrowserRouter></LanguageProvider>;
+  </Routes></PageTransition></BrowserRouter></OnboardingGate></LanguageProvider>;
 }
 export default App;

@@ -2,6 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Camera, Upload, Image as ImageIcon, RotateCcw, ShieldCheck, Loader2, Leaf } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
+import { getCurrentPosition } from "../utils/geo";
+import {
+  predictDisease,
+  uploadImage,
+  saveReport,
+  getOrCreateCrop,
+  getWeather,
+  saveWeather,
+} from "../utils/api";
+import { markScanCompleted } from "../utils/notifications";
 
 function DetectDisease() {
   const navigate = useNavigate();

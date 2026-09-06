@@ -31,11 +31,11 @@ function Home() {
         <div className="nav-links">
 
           <a href="#features">
-            Features
+            {t("features")}
           </a>
 
           <a href="#about">
-            About
+            {t("about")}
           </a>
 
           <label className="language-select">
@@ -46,9 +46,9 @@ function Home() {
               onChange={(e) => setLanguage(e.target.value)}
               aria-label={t("language")}
             >
-              <option value="en">English</option>
-              <option value="hi">हिन्दी</option>
-              <option value="mr">मराठी</option>
+              <option value="en">{t("languageEnglish")}</option>
+              <option value="hi">{t("languageHindi")}</option>
+              <option value="mr">{t("languageMarathi")}</option>
             </select>
           </label>
 
@@ -65,6 +65,8 @@ function Home() {
           <div className="badge">
             {t("heroBadge")}
           </div>
+
+          <div className="national-farming-slogan">JAI JAWAN JAI KISAN</div>
 
           <h1>
             {t("heroTitle")}
@@ -93,15 +95,15 @@ function Home() {
               </div>
 
               <span className="scan-crop-title">
-                Scan Crop
+                {t("scanCrop")}
               </span>
 
               <span className="scan-crop-subtitle">
-                Detect disease using your camera
+                {t("scanCropSub")}
               </span>
 
               <span className="scan-crop-arrow">
-                Start Scanning
+                {t("startScanning")}
                 <ArrowRight size={18} />
               </span>
             </Link>
@@ -120,7 +122,7 @@ function Home() {
 
 
           <p className="guest-note">
-            No account required for crop detection.
+            {t("guestNote")}
           </p>
 
         </div>
@@ -139,8 +141,7 @@ function Home() {
           </h3>
 
           <p>
-            Live camera scanning and AI-assisted
-            crop health analysis.
+            {t("liveCameraAnalysis")}
           </p>
 
           <div className="scan-status">
@@ -163,11 +164,11 @@ function Home() {
         <div className="section-heading">
 
           <p>
-            POWERFUL FEATURES
+            {t("powerfulFeatures")}
           </p>
 
           <h2>
-            Everything a farmer needs
+            {t("everythingFarmerNeeds")}
           </h2>
 
         </div>
@@ -175,56 +176,52 @@ function Home() {
 
         <div className="feature-grid">
 
-          {/* Camera Detection */}
+          {/* {t("cameraDetection")} */}
 
           <div className="feature-card">
 
             <Camera size={35} />
 
             <h3>
-              Camera Detection
+              {t("cameraDetection")}
             </h3>
 
             <p>
-              Open the live camera and capture a
-              crop image directly without browsing
-              files first.
+              {t("cameraDetectionText")}
             </p>
 
           </div>
 
 
-          {/* Smart Advisory */}
+          {/* {t("smartAdvisory")} */}
 
           <div className="feature-card">
 
             <ShieldCheck size={35} />
 
             <h3>
-              Smart Advisory
+              {t("smartAdvisory")}
             </h3>
 
             <p>
-              Get clear recommendations about
-              what action should be taken.
+              {t("smartAdvisoryText")}
             </p>
 
           </div>
 
 
-          {/* Disease Hotspots */}
+          {/* {t("diseaseHotspots")} */}
 
           <div className="feature-card">
 
             <Map size={35} />
 
             <h3>
-              Disease Hotspots
+              {t("diseaseHotspots")}
             </h3>
 
             <p>
-              View reported disease locations and
-              understand local crop risks.
+              {t("diseaseHotspotsText")}
             </p>
 
           </div>
