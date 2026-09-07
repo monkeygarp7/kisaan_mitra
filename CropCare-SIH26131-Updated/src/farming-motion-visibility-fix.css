@@ -1,0 +1,79 @@
+/* =========================================================
+   FARMING MOTION VISIBILITY FIX
+   Keeps the existing animation and UI unchanged.
+   The animation now sits between the page background and
+   the actual content/cards, so it remains visible.
+========================================================= */
+
+/* Keep the animated layer below interactive/page content. */
+.farming-motion {
+  z-index: 0 !important;
+  opacity: .78;
+  pointer-events: none;
+}
+
+/* Do not trap the page inside its own isolated stacking context. */
+.app-page,
+.home-page,
+.auth-page {
+  isolation: auto !important;
+}
+
+/* Make the large page backgrounds slightly transparent so the
+   existing farming animation can show through them. */
+.home-page .hero {
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,240,.84),
+    rgba(255,255,255,.82)
+  ) !important;
+}
+
+.home-page .features-section {
+  background: rgba(255,255,255,.84) !important;
+}
+
+.home-page .about-section {
+  background: rgba(241,248,242,.86) !important;
+}
+
+.app-page {
+  background: rgba(255,255,240,.88) !important;
+}
+
+.auth-page {
+  background: rgba(242,248,243,.92) !important;
+}
+
+/* Keep navigation, cards, buttons and form surfaces solid/crisp. */
+.navbar,
+.hero-card,
+.feature-card,
+.auth-card,
+.dashboard-card,
+.dashboard-menu-card,
+.upload-card,
+.details-card,
+.result-image-card,
+.result-card,
+.advisory-alert,
+.advice-card,
+.expert-note,
+.report-item,
+.forecast-table,
+.map-title,
+.map-legend,
+.hotspot-list > div,
+.expert-form,
+.success-card,
+.profile-card,
+.camera-card {
+  position: relative;
+  z-index: 2;
+}
+
+/* The animation itself must never block clicks/taps. */
+.farming-motion,
+.farming-motion * {
+  pointer-events: none !important;
+}
