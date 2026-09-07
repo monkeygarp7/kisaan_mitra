@@ -80,78 +80,201 @@ function getDayName(dateString, index) {
   );
 }
 
+/* ========================================
+   GET ACTUAL LOCATION NAME
+======================================== */
+
+async function getLocationName(latitude, longitude) {
+  try {
+    const response = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+    );
+
+    if (!response.ok) {
+      throw new Error("Location lookup failed");
+    }
+
+    const data = await response.json();
+
+    const locality =
+      data.locality ||
+      data.localityInfo?.administrative?.find(
+        (item) => item.order === 6
+      )?.name ||
+      "";
+
+    const city =
+      data.city ||
+      data.principalSubdivision ||
+      "";
+
+    const state =
+      data.principalSubdivision ||
+      "";
+
+    /* Remove duplicates */
+
+    const parts = [];
+
+    [locality, city, state].forEach((part) => {
+      if (
+        part &&
+        !parts.some(
+          (existing) =>
+            existing.toLowerCase() ===
+            part.toLowerCase()
+        )
+      ) {
+        parts.push(part);
+      }
+    });
+
+    if (parts.length > 0) {
+      return parts.join(", ");
+    }
+
+    return "Current Location";
+  } catch (error) {
+    console.error("Location error:", error);
+
+    return "Current Location";
+  }
+}
+
 function WeatherCard() {
   const [weather, setWeather] = useState(null);
+  const [locationName, setLocationName] =
+    useState("Detecting location...");
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!navigator.geolocation) {
-      setError("Location is not supported by your browser.");
+      setError(
+        "Location is not supported by your browser."
+      );
+
       setLoading(false);
+
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        const { latitude, longitude } = position.coords;
+        const {
+          latitude,
+          longitude,
+        } = position.coords;
 
         try {
-          const response = await fetch(
+          /* ========================================
+             WEATHER + LOCATION
+          ======================================== */
+
+          const weatherResponse = await fetch(
             `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,precipitation,rain,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code&timezone=auto`
           );
 
-          if (!response.ok) {
-            throw new Error("Weather request failed");
+          if (!weatherResponse.ok) {
+            throw new Error(
+              "Weather request failed"
+            );
           }
 
-          const data = await response.json();
+          const weatherData =
+            await weatherResponse.json();
 
-          const forecast = (data.daily?.time || [])
+          /* ========================================
+             REVERSE GEOCODE
+          ======================================== */
+
+          const actualLocation =
+            await getLocationName(
+              latitude,
+              longitude
+            );
+
+          setLocationName(actualLocation);
+
+          /* ========================================
+             7 DAY FORECAST
+          ======================================== */
+
+          const forecast = (
+            weatherData.daily?.time || []
+          )
             .slice(0, 7)
             .map((date, index) => ({
               date,
-              day: getDayName(date, index),
+
+              day: getDayName(
+                date,
+                index
+              ),
+
               max: Math.round(
-                data.daily.temperature_2m_max[index]
+                weatherData.daily
+                  .temperature_2m_max[index]
               ),
+
               min: Math.round(
-                data.daily.temperature_2m_min[index]
+                weatherData.daily
+                  .temperature_2m_min[index]
               ),
+
               rain:
-                data.daily.precipitation_probability_max[
+                weatherData.daily
+                  .precipitation_probability_max[
                   index
                 ] ?? 0,
-              code: data.daily.weather_code[index],
+
+              code:
+                weatherData.daily
+                  .weather_code[index],
             }));
+
+          /* ========================================
+             SET WEATHER
+          ======================================== */
 
           setWeather({
             temperature: Math.round(
-              data.current.temperature_2m
+              weatherData.current
+                .temperature_2m
             ),
 
             humidity:
-              data.current.relative_humidity_2m,
+              weatherData.current
+                .relative_humidity_2m,
 
             precipitation:
-              data.current.precipitation,
+              weatherData.current
+                .precipitation,
 
             rainProbability:
-              data.daily
-                ?.precipitation_probability_max?.[0] ?? 0,
+              weatherData.daily
+                ?.precipitation_probability_max?.[0] ??
+              0,
 
             wind: Math.round(
-              data.current.wind_speed_10m
+              weatherData.current
+                .wind_speed_10m
             ),
 
             weatherCode:
-              data.current.weather_code,
+              weatherData.current
+                .weather_code,
 
             forecast,
           });
+
         } catch (err) {
           console.error(err);
-          setError("Unable to fetch weather data.");
+
+          setError(
+            "Unable to fetch weather data."
+          );
         } finally {
           setLoading(false);
         }
@@ -162,55 +285,77 @@ function WeatherCard() {
           "Please allow location access to get weather."
         );
 
+        setLocationName(
+          "Location unavailable"
+        );
+
         setLoading(false);
+      },
+
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000,
       }
     );
   }, []);
 
-  /* -----------------------------
+  /* ========================================
      LOADING
-  ----------------------------- */
+  ======================================== */
 
   if (loading) {
     return (
       <section className="weather-card weather-card--state">
+
         <CloudSun size={36} />
 
         <div>
-          <strong>Loading weather...</strong>
+          <strong>
+            Loading weather...
+          </strong>
+
           <span>
-            Getting your local weather forecast
+            Detecting your location and weather
           </span>
         </div>
+
       </section>
     );
   }
 
-  /* -----------------------------
+  /* ========================================
      ERROR
-  ----------------------------- */
+  ======================================== */
 
   if (error) {
     return (
       <section className="weather-card weather-card--state">
+
         <CloudSun size={36} />
 
         <div>
-          <strong>Weather unavailable</strong>
+          <strong>
+            Weather unavailable
+          </strong>
 
-          <span>{error}</span>
+          <span>
+            {error}
+          </span>
         </div>
+
       </section>
     );
   }
 
-  /* -----------------------------
+  /* ========================================
      CURRENT WEATHER
-  ----------------------------- */
+  ======================================== */
 
-  const currentWeather = getWeatherMeta(
-    weather.weatherCode
-  );
+  const currentWeather =
+    getWeatherMeta(
+      weather.weatherCode
+    );
 
   const CurrentWeatherIcon =
     currentWeather.icon;
@@ -220,30 +365,47 @@ function WeatherCard() {
       className="weather-card"
       aria-label="Local weather"
     >
-      {/* HEADER */}
+
+      {/* ========================================
+          HEADER
+      ======================================== */}
 
       <div className="weather-headline">
+
         <div>
+
           <div className="weather-kicker">
             LOCAL WEATHER
           </div>
 
-          <h2>Today's Weather</h2>
+          <h2>
+            Today's Weather
+          </h2>
 
           <div className="weather-location">
+
             <MapPin size={15} />
 
-            <span>Your Location</span>
+            <span>
+              {locationName}
+            </span>
+
           </div>
+
         </div>
 
+
+        {/* CURRENT TEMPERATURE */}
+
         <div className="weather-current-condition">
+
           <CurrentWeatherIcon
             size={58}
             strokeWidth={1.8}
           />
 
           <div>
+
             <strong>
               {weather.temperature}°C
             </strong>
@@ -251,67 +413,104 @@ function WeatherCard() {
             <span>
               {currentWeather.label}
             </span>
+
           </div>
+
         </div>
+
       </div>
+
 
       <div className="weather-divider" />
 
-      {/* WEATHER STATS */}
+
+      {/* ========================================
+          WEATHER STATS
+      ======================================== */}
 
       <div className="weather-stats">
 
         <div className="weather-stat">
+
           <Droplets size={21} />
 
           <div>
-            <span>Humidity</span>
+
+            <span>
+              Humidity
+            </span>
 
             <strong>
               {weather.humidity}%
             </strong>
+
           </div>
+
         </div>
 
+
         <div className="weather-stat">
+
           <CloudRain size={21} />
 
           <div>
-            <span>Rain Chance</span>
+
+            <span>
+              Rain Chance
+            </span>
 
             <strong>
               {weather.rainProbability}%
             </strong>
+
           </div>
+
         </div>
 
+
         <div className="weather-stat">
+
           <Wind size={21} />
 
           <div>
-            <span>Wind</span>
+
+            <span>
+              Wind
+            </span>
 
             <strong>
               {weather.wind} km/h
             </strong>
+
           </div>
+
         </div>
 
+
         <div className="weather-stat">
+
           <CloudRain size={21} />
 
           <div>
-            <span>Rainfall</span>
+
+            <span>
+              Rainfall
+            </span>
 
             <strong>
               {weather.precipitation} mm
             </strong>
+
           </div>
+
         </div>
 
       </div>
 
-      {/* 7 DAY FORECAST */}
+
+      {/* ========================================
+          7 DAY FORECAST
+      ======================================== */}
 
       <div className="forecast-section">
 
@@ -322,17 +521,22 @@ function WeatherCard() {
         <div className="forecast-list">
 
           {weather.forecast.map((day) => {
+
             const dayWeather =
-              getWeatherMeta(day.code);
+              getWeatherMeta(
+                day.code
+              );
 
             const DayIcon =
               dayWeather.icon;
 
             return (
+
               <div
                 className="forecast-day"
                 key={day.date}
               >
+
                 <span className="forecast-day-label">
                   {day.day}
                 </span>
@@ -353,14 +557,20 @@ function WeatherCard() {
                 <span className="forecast-rain">
                   {day.rain}% rain
                 </span>
+
               </div>
+
             );
           })}
 
         </div>
+
       </div>
 
-      {/* CROP ADVICE */}
+
+      {/* ========================================
+          CROP ADVICE
+      ======================================== */}
 
       <div className="weather-advice">
 
@@ -369,13 +579,23 @@ function WeatherCard() {
         </div>
 
         <p>
+
           {weather.rainProbability >= 60
+
             ? "Rain is likely. Avoid unnecessary irrigation today."
+
             : weather.humidity >= 80
+
             ? "High humidity detected. Monitor crops for fungal diseases."
+
             : weather.temperature >= 35
+
             ? "High temperature detected. Prefer irrigation during cooler hours."
-            : "Weather conditions look suitable. Continue regular crop monitoring."}
+
+            : "Weather conditions look suitable. Continue regular crop monitoring."
+
+          }
+
         </p>
 
       </div>
