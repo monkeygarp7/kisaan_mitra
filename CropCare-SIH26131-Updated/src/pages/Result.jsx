@@ -97,6 +97,12 @@ function Result() {
          
          {!isHealthy && (
   <>
+  {isHealthy ? (
+  <div className="healthy-result">
+    <h3>Leaf is totally healthy</h3>
+  </div>
+) : (
+  <>
     <div className="symptoms">
       <h3>Common Symptoms</h3>
       <ul>
@@ -113,6 +119,14 @@ function Result() {
       View Treatment Advice
       <ArrowRight size={18} />
     </Link>
+  </>
+)}
+
+<Link to="/detect" className="primary-btn">
+  <Camera size={18} />
+  Scan Again
+  <ArrowRight size={18} />
+</Link>
   </>
 )}
         </div>
