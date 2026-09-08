@@ -122,7 +122,11 @@ function Result() {
   </>
 )}
 
-<Link to="/detect" className="primary-btn">
+<Link
+  to="/detect"
+  className="primary-btn"
+  style={{ marginTop: "12px" }}
+>
   <Camera size={18} />
   Scan Again
   <ArrowRight size={18} />
