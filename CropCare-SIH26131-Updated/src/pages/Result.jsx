@@ -163,15 +163,31 @@ function Result() {
                 </ul>
               </div>
 
-              <Link
+           <Link
   to="/advisory"
   state={{
-    disease: data.disease || prediction.disease,
-    confidence: data.confidence || prediction.confidence,
-    symptoms: data.symptoms || prediction.symptoms || [],
-    recommendation:
-      data.recommendation || prediction.recommendation || "",
-    diseaseInfo,
+    prediction: {
+      ...prediction,
+      disease: data.disease || prediction.disease,
+      confidence: data.confidence || prediction.confidence,
+      symptoms: data.symptoms || prediction.symptoms || [],
+      recommendation:
+        data.recommendation ||
+        prediction.recommendation ||
+        "",
+      prevention:
+        data.prevention ||
+        prediction.prevention ||
+        "",
+      treatment:
+        data.treatment ||
+        prediction.treatment ||
+        "",
+      is_healthy:
+        data.is_healthy ??
+        prediction.is_healthy ??
+        false,
+    },
   }}
   className="primary-btn"
 >
