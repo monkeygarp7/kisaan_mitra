@@ -224,6 +224,7 @@ async def upload_image(file: UploadFile = File(...)):
 # ---------------------------------------
 # CROP DISEASE PREDICTION
 # ---------------------------------------
+from io import BytesIO
 
 @app.post("/predict")
 async def predict_disease(file: UploadFile = File(...)):
@@ -239,41 +240,57 @@ async def predict_disease(file: UploadFile = File(...)):
             detail="Only JPG and PNG images are allowed"
         )
 
-    # Save image
-    extension = file.filename.split(".")[-1]
-
-    filename = f"{uuid.uuid4()}.{extension}"
-
-    filepath = os.path.join(
-        UPLOAD_FOLDER,
-        filename
-    )
-
+    # Read image directly into memory
     contents = await file.read()
 
-    with open(filepath, "wb") as image:
-        image.write(contents)
+    try:
+        image_pil = Image.open(BytesIO(contents)).convert("RGB")
+    except Exception:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid image file"
+        )
 
-    # REAL AI PREDICTION
-    image_pil = Image.open(filepath).convert("RGB")
+    # Preprocess image
     tensor = transform(image_pil).unsqueeze(0).to(device)
 
-    with torch.no_grad():
+    # AI prediction
+    with torch.inference_mode():
         outputs = model(tensor)
         probabilities = torch.nn.functional.softmax(outputs[0], dim=0)
         confidence_val, predicted_idx = torch.max(probabilities, 0)
 
     full_class = CLASS_NAMES[predicted_idx.item()]
     confidence = round(confidence_val.item() * 100, 2)
+
     is_healthy = "healthy" in full_class.lower()
+
     disease = full_class.split("___")[-1].replace("_", " ")
-    severity = "None" if is_healthy else ("High" if confidence > 85 else "Medium" if confidence > 60 else "Low")
-    symptoms = SYMPTOMS.get(full_class, DEFAULT_SYMPTOMS)
-    recommendation = RECOMMENDATIONS.get(full_class, "Consult an agriculture expert for appropriate treatment.")
+
+    severity = (
+        "None"
+        if is_healthy
+        else (
+            "High"
+            if confidence > 85
+            else "Medium"
+            if confidence > 60
+            else "Low"
+        )
+    )
+
+    symptoms = SYMPTOMS.get(
+        full_class,
+        DEFAULT_SYMPTOMS
+    )
+
+    recommendation = RECOMMENDATIONS.get(
+        full_class,
+        "Consult an agriculture expert for appropriate treatment."
+    )
 
     return {
         "success": True,
-        "image": filename,
         "prediction": {
             "disease": disease,
             "full_class": full_class,
@@ -284,7 +301,6 @@ async def predict_disease(file: UploadFile = File(...)):
             "recommendation": recommendation
         }
     }
-
 # ---------------------------------------
 # SAVE DISEASE REPORT
 # ---------------------------------------
