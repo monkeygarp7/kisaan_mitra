@@ -15,116 +15,140 @@ function Advisory() {
 
   const data = location.state || {};
 
-  const disease = data.disease || "Unknown Disease";
+  // Support both:
+  // { disease, recommendation, ... }
+  // and
+  // { prediction: { disease, recommendation, ... } }
+  const prediction = data.prediction || data;
 
+  const disease = prediction.disease || "Unknown disease";
   const recommendation =
-    data.recommendation ||
-    "Monitor the affected crop and consult an agriculture expert for appropriate treatment.";
+    prediction.recommendation ||
+    "Consult an agriculture expert for appropriate treatment.";
 
-  const symptoms =
-    data.symptoms && data.symptoms.length > 0
-      ? data.symptoms
-      : [
-          "Unusual discoloration on leaves",
-          "Spots or lesions visible on plant",
-          "Affected areas may spread if untreated",
-        ];
+  const symptoms = Array.isArray(prediction.symptoms)
+    ? prediction.symptoms
+    : [];
 
-  const info = data.diseaseInfo;
+  const prevention =
+    prediction.prevention ||
+    "Maintain good crop hygiene, proper airflow and regular crop monitoring.";
+
+  const treatment =
+    prediction.treatment ||
+    recommendation;
+
+  const isHealthy =
+    prediction.is_healthy === true ||
+    disease.toLowerCase() === "healthy";
 
   return (
     <div className="app-page">
+
+      {/* Back */}
       <Link to="/result" className="back-link">
         <ArrowLeft size={18} />
-        {t("backToResult")}
+        Back to Result
       </Link>
 
+      {/* Heading */}
       <div className="page-heading">
-        <p className="small-label">{t("cropAdvisory")}</p>
+        <span className="eyebrow">CROP ADVISORY</span>
 
-        <h1>{t("recommendedAction")}</h1>
+        <h1>Recommended Action</h1>
 
-        <p>{t("advisoryText")}</p>
+        <p>
+          Practical steps based on the detected crop condition.
+        </p>
       </div>
 
-      {/* DETECTED DISEASE */}
+      {/* Alert */}
       <div className="advisory-alert">
         <AlertTriangle size={25} />
 
         <div>
           <strong>
-            {disease} {t("detected")}
+            {isHealthy
+              ? "Healthy crop detected"
+              : `${disease} detected`}
           </strong>
 
-          <p>{recommendation}</p>
+          <p>
+            {isHealthy
+              ? "No disease treatment is required. Continue normal crop care."
+              : recommendation}
+          </p>
         </div>
       </div>
 
-      {/* VOICE ADVISORY */}
+      {/* Voice */}
       <SpeakButton
-        text={`${disease} ${t("detected")}. ${recommendation} ${
-          info?.treatment || ""
-        } ${info?.prevention || ""}`}
-        className="advisory-speak-btn"
+        text={`${disease} detected. ${recommendation} Treatment: ${treatment}. Prevention: ${prevention}.`}
+        label="Listen"
       />
 
+      {/* Advice cards */}
       <div className="advisory-grid">
 
-        {/* CARD 1 */}
+        {/* Symptoms */}
         <div className="advice-card">
           <Scissors size={32} />
 
-          <h3>1. {t("removeLeaves")}</h3>
+          <h3>1. Symptoms</h3>
 
-          <p>
-            {symptoms[0] ||
-              "Inspect the affected parts of the plant and remove visibly damaged material where appropriate."}
-          </p>
+          {symptoms.length > 0 ? (
+            <ul>
+              {symptoms.map((symptom, index) => (
+                <li key={index}>{symptom}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>
+              Monitor the plant for unusual discoloration,
+              spots or lesions.
+            </p>
+          )}
         </div>
 
-        {/* CARD 2 */}
+        {/* Prevention */}
         <div className="advice-card">
           <Droplets size={32} />
 
-          <h3>2. {t("manageWatering")}</h3>
+          <h3>2. Prevention</h3>
 
-          <p>
-            {symptoms[1] ||
-              "Avoid conditions that keep plant foliage unnecessarily wet and monitor the crop regularly."}
-          </p>
+          <p>{prevention}</p>
         </div>
 
-        {/* CARD 3 */}
+        {/* Treatment */}
         <div className="advice-card">
           <ShieldCheck size={32} />
 
-          <h3>3. {t("monitorCrop")}</h3>
+          <h3>3. Treatment</h3>
 
-          <p>
-            {recommendation ||
-              info?.treatment ||
-              t("monitorCropText")}
-          </p>
+          <p>{treatment}</p>
         </div>
 
       </div>
 
-      {/* IMPORTANT NOTE */}
-      <div className="expert-note">
-        <h3>⚠️ {t("important")}</h3>
+      {/* Important note */}
+      {!isHealthy && (
+        <div className="expert-note">
+          <h3>⚠️ {t("important")}</h3>
 
-        <p>
-          {t("importantText")}
-        </p>
+          <p>
+            {t("importantText")}
+          </p>
 
-        <Link
-          to="/expert"
-          state={{ disease }}
-          className="secondary-btn"
-        >
-          {t("askExpert")}
-        </Link>
-      </div>
+          <Link
+            to="/expert"
+            state={{ disease }}
+            className="secondary-btn"
+          >
+            {t("askExpert")}
+          </Link>
+        </div>
+      )}
+
     </div>
   );
 }
