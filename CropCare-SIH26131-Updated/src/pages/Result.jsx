@@ -92,21 +92,26 @@ function Result() {
             </div>
           </div>
          
-          <div className="symptoms">
-            <h3>Common Symptoms</h3>
-            <ul>
-              {(data.symptoms && data.symptoms.length > 0
-                ? data.symptoms
-                : ["No specific symptoms data available"]
-              ).map((symptom, index) => (
-                <li key={index}>{symptom}</li>
-              ))}
-            </ul>
-          </div>
-          <Link to="/advisory" className="primary-btn">
-            View Treatment Advice
-            <ArrowRight size={18} />
-          </Link>
+         {!isHealthy && (
+  <>
+    <div className="symptoms">
+      <h3>Common Symptoms</h3>
+      <ul>
+        {(data.symptoms && data.symptoms.length > 0
+          ? data.symptoms
+          : ["No specific symptoms data available"]
+        ).map((symptom, index) => (
+          <li key={index}>{symptom}</li>
+        ))}
+      </ul>
+    </div>
+
+    <Link to="/advisory" className="primary-btn">
+      View Treatment Advice
+      <ArrowRight size={18} />
+    </Link>
+  </>
+)}
         </div>
       </div>
 
