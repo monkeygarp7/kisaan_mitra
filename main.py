@@ -1580,11 +1580,4 @@ def get_farmer_referrals(farmer_id: int):
         }
         for row in referrals
     ]
-    start = time.time()
-
-with torch.inference_mode():
-    outputs = model(tensor)
-    probabilities = torch.nn.functional.softmax(outputs[0], dim=0)
-    confidence_val, predicted_idx = torch.max(probabilities, 0)
-
-print("AI inference time:", time.time() - start)
+ 
