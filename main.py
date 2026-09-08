@@ -318,18 +318,30 @@ async def predict_disease(file: UploadFile = File(...)):
 
     disease = full_class.split("___")[-1].replace("_", " ")
 
-    severity = (
-        "None"
-        if is_healthy
-        else (
-            "High"
-            if confidence > 85
-            else "Medium"
-            if confidence > 60
-            else "Low"
-        )
-    )
+    # Get disease-specific information from the database
+disease_info = get_disease_information(full_class)
 
+if disease_info:
+    symptoms_text = disease_info.get("symptoms") or ""
+    prevention = disease_info.get("prevention") or ""
+    treatment = disease_info.get("treatment") or ""
+
+    # Convert database symptom text into a list for the frontend
+    symptoms = [
+        item.strip()
+        for item in symptoms_text.replace(";", ",").split(",")
+        if item.strip()
+    ]
+
+    recommendation = treatment or prevention or DEFAULT_RECOMMENDATION
+    database_severity = disease_info.get("severity")
+
+    # Use database severity when available
+    severity = database_severity or (
+        "High" if confidence >= 0.8 else "Medium"
+    )
+else:
+    # Fallback for safety if the database lookup fails
     symptoms = SYMPTOMS.get(
         full_class,
         DEFAULT_SYMPTOMS
@@ -337,8 +349,13 @@ async def predict_disease(file: UploadFile = File(...)):
 
     recommendation = RECOMMENDATIONS.get(
         full_class,
-        "Consult an agriculture expert for appropriate treatment."
+        DEFAULT_RECOMMENDATION
     )
+
+    severity = "High" if confidence >= 0.8 else "Medium"
+
+    prevention = ""
+    treatment = ""
 
     return {
         "success": True,
