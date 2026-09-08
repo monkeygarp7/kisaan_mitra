@@ -25,10 +25,11 @@ function Result() {
 
   const isDemo = !data.prediction;
 
-  const isHealthy =
-    data.is_healthy === true ||
-    data.disease?.toLowerCase() === "healthy" ||
-    prediction.disease?.toLowerCase() === "healthy";
+ const isHealthy =
+  data.is_healthy === true ||
+  prediction.is_healthy === true ||
+  data.disease?.toLowerCase() === "healthy" ||
+  prediction.disease?.toLowerCase() === "healthy";
 
   const [diseaseInfo, setDiseaseInfo] = useState(null);
 
