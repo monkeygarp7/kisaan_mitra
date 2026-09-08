@@ -97,14 +97,17 @@ function Result() {
          
          {!isHealthy && (
   <>
-  {isHealthy ? (
+{isHealthy ? (
   <div className="healthy-result">
-    <h3>Leaf is totally healthy</h3>
+    <h3>
+      Leaf is totally good, no infection detected
+    </h3>
   </div>
 ) : (
   <>
     <div className="symptoms">
       <h3>Common Symptoms</h3>
+
       <ul>
         {(data.symptoms && data.symptoms.length > 0
           ? data.symptoms
@@ -115,13 +118,17 @@ function Result() {
       </ul>
     </div>
 
-    <Link to="/advisory" className="primary-btn">
+    <Link
+      to="/advisory"
+      className="primary-btn"
+    >
       View Treatment Advice
       <ArrowRight size={18} />
     </Link>
   </>
 )}
 
+{/* Scan Again appears on EVERY result */}
 <Link
   to="/detect"
   className="primary-btn"
@@ -131,8 +138,6 @@ function Result() {
   Scan Again
   <ArrowRight size={18} />
 </Link>
-  </>
-)}
         </div>
       </div>
 
