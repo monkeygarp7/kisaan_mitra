@@ -280,7 +280,6 @@ from io import BytesIO
 @app.post("/predict")
 async def predict_disease(file: UploadFile = File(...)):
 
-    # Check file type
     if file.content_type not in [
         "image/jpeg",
         "image/png",
@@ -291,7 +290,6 @@ async def predict_disease(file: UploadFile = File(...)):
             detail="Only JPG and PNG images are allowed"
         )
 
-    # Read image directly into memory
     contents = await file.read()
 
     try:
@@ -302,10 +300,8 @@ async def predict_disease(file: UploadFile = File(...)):
             detail="Invalid image file"
         )
 
-    # Preprocess image
     tensor = transform(image_pil).unsqueeze(0).to(device)
 
-    # AI prediction
     with torch.inference_mode():
         outputs = model(tensor)
         probabilities = torch.nn.functional.softmax(outputs[0], dim=0)
@@ -318,61 +314,86 @@ async def predict_disease(file: UploadFile = File(...)):
 
     disease = full_class.split("___")[-1].replace("_", " ")
 
-    # Get disease-specific information from the database
-disease_info = get_disease_information(full_class)
+    # Get information from database
+    disease_info = get_disease_information(full_class)
 
-if disease_info:
-    symptoms_text = disease_info.get("symptoms") or ""
-    prevention = disease_info.get("prevention") or ""
-    treatment = disease_info.get("treatment") or ""
+    if disease_info:
 
-    # Convert database symptom text into a list for the frontend
-    symptoms = [
-        item.strip()
-        for item in symptoms_text.replace(";", ",").split(",")
-        if item.strip()
-    ]
+        symptoms_text = disease_info.get("symptoms") or ""
+        prevention = disease_info.get("prevention") or ""
+        treatment = disease_info.get("treatment") or ""
 
-    recommendation = treatment or prevention or DEFAULT_RECOMMENDATION
-    database_severity = disease_info.get("severity")
+        symptoms = [
+            item.strip()
+            for item in symptoms_text.replace(";", ",").split(",")
+            if item.strip()
+        ]
 
-    # Use database severity when available
-    severity = database_severity or (
-        "High" if confidence >= 0.8 else "Medium"
-    )
-else:
-    # Fallback for safety if the database lookup fails
-    symptoms = SYMPTOMS.get(
-        full_class,
-        DEFAULT_SYMPTOMS
-    )
+        recommendation = (
+            treatment
+            or prevention
+            or "Consult an agriculture expert for appropriate treatment."
+        )
 
-    recommendation = RECOMMENDATIONS.get(
-        full_class,
-        DEFAULT_RECOMMENDATION
-    )
+        severity = (
+            "None"
+            if is_healthy
+            else disease_info.get("severity") or (
+                "High"
+                if confidence > 85
+                else "Medium"
+                if confidence > 60
+                else "Low"
+            )
+        )
 
-    severity = "High" if confidence >= 0.8 else "Medium"
+    else:
 
-    prevention = ""
-    treatment = ""
+        severity = (
+            "None"
+            if is_healthy
+            else (
+                "High"
+                if confidence > 85
+                else "Medium"
+                if confidence > 60
+                else "Low"
+            )
+        )
 
-   return {
-    "success": True,
-    "prediction": {
-        "disease": disease,
-        "full_class": full_class,
-        "crop": disease_info.get("crop") if disease_info else full_class.split("___")[0],
-        "confidence": confidence,
-        "severity": severity,
-        "is_healthy": is_healthy,
-        "symptoms": symptoms,
-        "recommendation": recommendation,
-        "prevention": prevention,
-        "treatment": treatment,
-        "database_info_available": disease_info is not None
+        symptoms = SYMPTOMS.get(
+            full_class,
+            DEFAULT_SYMPTOMS
+        )
+
+        recommendation = RECOMMENDATIONS.get(
+            full_class,
+            "Consult an agriculture expert for appropriate treatment."
+        )
+
+        prevention = ""
+        treatment = ""
+
+    return {
+        "success": True,
+        "prediction": {
+            "disease": disease,
+            "full_class": full_class,
+            "crop": (
+                disease_info.get("crop")
+                if disease_info
+                else full_class.split("___")[0]
+            ),
+            "confidence": confidence,
+            "severity": severity,
+            "is_healthy": is_healthy,
+            "symptoms": symptoms,
+            "recommendation": recommendation,
+            "prevention": prevention,
+            "treatment": treatment,
+            "database_info_available": disease_info is not None
+        }
     }
-}
 # ---------------------------------------
 # SAVE DISEASE REPORT
 # ---------------------------------------
