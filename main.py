@@ -357,18 +357,22 @@ else:
     prevention = ""
     treatment = ""
 
-    return {
-        "success": True,
-        "prediction": {
-            "disease": disease,
-            "full_class": full_class,
-            "confidence": confidence,
-            "severity": severity,
-            "is_healthy": is_healthy,
-            "symptoms": symptoms,
-            "recommendation": recommendation
-        }
+   return {
+    "success": True,
+    "prediction": {
+        "disease": disease,
+        "full_class": full_class,
+        "crop": disease_info.get("crop") if disease_info else full_class.split("___")[0],
+        "confidence": confidence,
+        "severity": severity,
+        "is_healthy": is_healthy,
+        "symptoms": symptoms,
+        "recommendation": recommendation,
+        "prevention": prevention,
+        "treatment": treatment,
+        "database_info_available": disease_info is not None
     }
+}
 # ---------------------------------------
 # SAVE DISEASE REPORT
 # ---------------------------------------
