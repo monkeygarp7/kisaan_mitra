@@ -247,11 +247,14 @@ async def upload_image(file: UploadFile = File(...)):
 # CROP DISEASE PREDICTION
 # ---------------------------------------
 from io import BytesIO
-
 @app.post("/predict")
 async def predict_disease(file: UploadFile = File(...)):
 
-    # Check file type
+    total_start = time.perf_counter()
+
+    # -----------------------------
+    # 1. CHECK FILE
+    # -----------------------------
     if file.content_type not in [
         "image/jpeg",
         "image/png",
@@ -262,8 +265,19 @@ async def predict_disease(file: UploadFile = File(...)):
             detail="Only JPG and PNG images are allowed"
         )
 
-    # Read image directly into memory
+    # -----------------------------
+    # 2. READ IMAGE
+    # -----------------------------
+    start = time.perf_counter()
+
     contents = await file.read()
+
+    read_time = time.perf_counter() - start
+
+    # -----------------------------
+    # 3. OPEN IMAGE
+    # -----------------------------
+    start = time.perf_counter()
 
     try:
         image_pil = Image.open(BytesIO(contents)).convert("RGB")
@@ -273,14 +287,33 @@ async def predict_disease(file: UploadFile = File(...)):
             detail="Invalid image file"
         )
 
-    # Preprocess image
+    open_time = time.perf_counter() - start
+
+    # -----------------------------
+    # 4. PREPROCESS
+    # -----------------------------
+    start = time.perf_counter()
+
     tensor = transform(image_pil).unsqueeze(0).to(device)
 
-    # AI prediction
+    preprocess_time = time.perf_counter() - start
+
+    # -----------------------------
+    # 5. MODEL INFERENCE
+    # -----------------------------
+    start = time.perf_counter()
+
     with torch.inference_mode():
         outputs = model(tensor)
         probabilities = torch.nn.functional.softmax(outputs[0], dim=0)
         confidence_val, predicted_idx = torch.max(probabilities, 0)
+
+    inference_time = time.perf_counter() - start
+
+    # -----------------------------
+    # 6. POSTPROCESSING
+    # -----------------------------
+    start = time.perf_counter()
 
     full_class = CLASS_NAMES[predicted_idx.item()]
     confidence = round(confidence_val.item() * 100, 2)
@@ -310,6 +343,27 @@ async def predict_disease(file: UploadFile = File(...)):
         full_class,
         "Consult an agriculture expert for appropriate treatment."
     )
+
+    postprocess_time = time.perf_counter() - start
+
+    # -----------------------------
+    # 7. TOTAL
+    # -----------------------------
+    total_time = time.perf_counter() - total_start
+
+    print("\n========================================")
+    print("PREDICTION TIMING")
+    print("========================================")
+    print(f"Image read       : {read_time:.4f} sec")
+    print(f"Image opening    : {open_time:.4f} sec")
+    print(f"Preprocessing    : {preprocess_time:.4f} sec")
+    print(f"Model inference  : {inference_time:.4f} sec")
+    print(f"Postprocessing   : {postprocess_time:.4f} sec")
+    print("----------------------------------------")
+    print(f"TOTAL            : {total_time:.4f} sec")
+    print(f"Device           : {device}")
+    print(f"Prediction       : {disease}")
+    print("========================================\n")
 
     return {
         "success": True,
