@@ -77,6 +77,35 @@ RECOMMENDATIONS = {
     'Potato___Late_blight': 'Urgent: apply systemic fungicide. Destroy infected plants away from field.',
     'Corn_(maize)___Common_rust_': 'Apply fungicide if severe. Plant resistant varieties next season.',
 }
+def get_disease_information(full_class):
+    """
+    Fetch disease information from the SQLite knowledge base.
+    The full_class must match the PlantVillage class name.
+    """
+    connection = get_connection()
+
+    row = connection.execute(
+        """
+        SELECT
+            disease_name,
+            crop,
+            symptoms,
+            severity,
+            prevention,
+            treatment
+        FROM diseases
+        WHERE disease_name = ?
+        LIMIT 1
+        """,
+        (full_class,)
+    ).fetchone()
+
+    connection.close()
+
+    if row:
+        return dict(row)
+
+    return None
 
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
