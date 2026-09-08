@@ -163,12 +163,20 @@ function Result() {
               </div>
 
               <Link
-                to="/advisory"
-                className="primary-btn"
-              >
-                View Treatment Advice
-                <ArrowRight size={18} />
-              </Link>
+  to="/advisory"
+  state={{
+    disease: data.disease || prediction.disease,
+    confidence: data.confidence || prediction.confidence,
+    symptoms: data.symptoms || prediction.symptoms || [],
+    recommendation:
+      data.recommendation || prediction.recommendation || "",
+    diseaseInfo,
+  }}
+  className="primary-btn"
+>
+  View Treatment Advice
+  <ArrowRight size={18} />
+</Link>
             </>
           )}
 
