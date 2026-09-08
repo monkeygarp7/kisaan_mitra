@@ -6,9 +6,7 @@ import {
   Leaf,
   ArrowRight,
   Camera,
-  RotateCcw,
 } from "lucide-react";
-import SpeakButton from "../components/SpeakButton";
 import { findDiseaseInfo } from "../utils/api";
 import { useLanguage } from "../context/LanguageContext";
 
@@ -26,29 +24,32 @@ function Result() {
   };
 
   const isDemo = !data.prediction;
+
   const isHealthy =
-  data.is_healthy === true ||
-  data.disease?.toLowerCase() === "healthy" ||
-  prediction.disease?.toLowerCase() === "healthy";
+    data.is_healthy === true ||
+    data.disease?.toLowerCase() === "healthy" ||
+    prediction.disease?.toLowerCase() === "healthy";
 
   const [diseaseInfo, setDiseaseInfo] = useState(null);
 
   useEffect(() => {
     let active = true;
+
+    if (isHealthy) {
+      setDiseaseInfo(null);
+      return undefined;
+    }
+
     findDiseaseInfo(prediction.disease).then((info) => {
-      if (active) setDiseaseInfo(info);
+      if (active) {
+        setDiseaseInfo(info);
+      }
     });
+
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prediction.disease]);
-
-  const confidenceValue = Math.round(prediction.confidence ?? 0);
-  const confidenceLabel =
-    confidenceValue >= 85 ? "High" : confidenceValue >= 60 ? "Moderate" : "Low";
-
-  const speakText = `${prediction.disease}. ${isHealthy ? "" : `${prediction.severity} severity. `}Detection confidence ${confidenceValue} percent. ${prediction.recommendation || ""}`;
+  }, [prediction.disease, isHealthy]);
 
   return (
     <div className="app-page">
@@ -67,77 +68,120 @@ function Result() {
         {/* Image */}
         <div className="result-image-card">
           {data.image ? (
-            <img src={data.image} alt={t("analyzedCrop")} />
+            <img
+              src={data.image}
+              alt={t("analyzedCrop")}
+            />
           ) : (
             <div className="demo-image">
               <Leaf size={70} />
-              <p>{isDemo ? t("demoAnalysis") : t("photoNotStored")}</p>
+              <p>
+                {isDemo
+                  ? t("demoAnalysis")
+                  : t("photoNotStored")}
+              </p>
             </div>
           )}
         </div>
 
         {/* Result */}
         <div className="result-card">
+          {/* Status */}
           <div className="result-warning">
-            {data.is_healthy ? <CheckCircle2 size={25} /> : <AlertTriangle size={25} />}
+            {isHealthy ? (
+              <CheckCircle2 size={25} />
+            ) : (
+              <AlertTriangle size={25} />
+            )}
+
             <div>
-              <span>{data.is_healthy ? "Plant is Healthy" : "Possible Disease Detected"}</span>
-              <h2>{data.disease || "Analyzing..."}</h2>
+              <span>
+                {isHealthy
+                  ? "Plant is Healthy"
+                  : "Possible Disease Detected"}
+              </span>
+
+              <h2>
+                {data.disease || "Analyzing..."}
+              </h2>
             </div>
           </div>
+
+          {/* Confidence */}
           <div className="confidence">
             <div className="confidence-top">
               <span>Detection Confidence</span>
-              <strong>{data.confidence ? `${data.confidence}%` : "N/A"}</strong>
+
+              <strong>
+                {data.confidence
+                  ? `${data.confidence}%`
+                  : "N/A"}
+              </strong>
             </div>
+
             <div className="progress">
-              <div className="progress-fill" style={{ width: `${data.confidence || 0}%` }}></div>
+              <div
+                className="progress-fill"
+                style={{
+                  width: `${data.confidence || 0}%`,
+                }}
+              ></div>
             </div>
           </div>
-         
-         {!isHealthy && (
-  <>
-{isHealthy ? (
-  <div className="healthy-result">
-    <h3>
-      Leaf is totally good, no infection detected
-    </h3>
-  </div>
-) : (
-  <>
-    <div className="symptoms">
-      <h3>Common Symptoms</h3>
 
-      <ul>
-        {(data.symptoms && data.symptoms.length > 0
-          ? data.symptoms
-          : ["No specific symptoms data available"]
-        ).map((symptom, index) => (
-          <li key={index}>{symptom}</li>
-        ))}
-      </ul>
-    </div>
+          {/* Healthy / Diseased Content */}
+          {isHealthy ? (
+            <div
+              className="healthy-result"
+              style={{
+                marginTop: "24px",
+                padding: "20px",
+                borderRadius: "14px",
+                background: "#e8f6eb",
+              }}
+            >
+              <h3>
+                Leaf is totally good, no infection detected
+              </h3>
+            </div>
+          ) : (
+            <>
+              <div className="symptoms">
+                <h3>Common Symptoms</h3>
 
-    <Link
-      to="/advisory"
-      className="primary-btn"
-    >
-      View Treatment Advice
-      <ArrowRight size={18} />
-    </Link>
-  </>
-)}
+                <ul>
+                  {(data.symptoms &&
+                  data.symptoms.length > 0
+                    ? data.symptoms
+                    : ["No specific symptoms data available"]
+                  ).map((symptom, index) => (
+                    <li key={index}>
+                      {symptom}
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-{/* Scan Again appears on EVERY result */}
-<Link
-  to="/detect"
-  className="primary-btn"
-  style={{ marginTop: "12px" }}
->
-  <Camera size={18} />
-  Scan Again
-  <ArrowRight size={18} />
-</Link>
+              <Link
+                to="/advisory"
+                className="primary-btn"
+              >
+                View Treatment Advice
+                <ArrowRight size={18} />
+              </Link>
+            </>
+          )}
+
+          {/* ALWAYS SHOW SCAN AGAIN */}
+          <Link
+            to="/detect"
+            className="primary-btn"
+            style={{ marginTop: "12px" }}
+          >
+            <Camera size={18} />
+            Scan Again
+            <ArrowRight size={18} />
+          </Link>
         </div>
       </div>
 
