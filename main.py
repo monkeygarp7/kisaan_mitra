@@ -85,11 +85,32 @@ transform = transforms.Compose([
 ])
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# --------------------------------------------------
+# LOAD BEST MODEL
+# MobileNetV2 + Fine-Tuning + Linear + AdamW
+# Test Accuracy: 98.21%
+# --------------------------------------------------
+
 model = models.mobilenet_v2(weights=None)
-model.classifier[1] = nn.Linear(model.last_channel, 38)
-model.load_state_dict(torch.load("crop_disease_model.pth", map_location=device))
+
+num_classes = 38
+
+model.classifier = nn.Sequential(
+    nn.Dropout(p=0.2),
+    nn.Linear(model.last_channel, num_classes)
+)
+
+model.load_state_dict(
+    torch.load(
+        "crop_disease_model_mobilenetv2_linear_adamw_finetune.pth",
+        map_location=device
+    )
+)
+
 model = model.to(device)
 model.eval()
+
+print("Best MobileNetV2 fine-tuned model loaded successfully.")
 print(f"Kisaan Mitra AI model loaded on {device}")
 
 
