@@ -1,16 +1,25 @@
+/*
+=========================================================
+KISAAN MITRA - FARMING MOTION VISIBILITY FIX v3
+IMPORTANT: Replace the previous farming-motion-visibility-fix.css
+with this file. Do not keep both files.
+=========================================================
+*/
 
-   KISAAN MITRA - FARMING MOTION VISIBILITY FIX v2
-   IMPORTANT: Replace the previous farming-motion-visibility-fix.css
-   with this file. Do not keep both files.
-========================================================= */
+/* Make the page/root backgrounds transparent so the animation can be seen. */
+html,
+body,
+#root {
+  background: transparent !important;
+}
 
-/* The animation must be a real background layer. */
 .page-content {
-  position: relative;
+  position: relative !important;
   min-height: 100vh;
   background: transparent !important;
 }
 
+/* The animation is a fixed background layer. */
 .farming-motion {
   position: fixed !important;
   inset: 0 !important;
@@ -21,58 +30,68 @@
   pointer-events: none !important;
 }
 
-/* Keep every page above the animation, but transparent itself. */
+/* Keep application/page content above the animation. */
 .home-page,
 .app-page,
 .auth-page {
   position: relative !important;
   z-index: 1 !important;
   isolation: auto !important;
+}
+
+/* Do not let the large page backgrounds cover the animation. */
+.home-page {
   background: transparent !important;
 }
 
-/* HOME HERO
-   The old solid #fffff0 -> #ffffff gradient was covering the
-   animation completely. Make it translucent instead. */
+.app-page {
+  background: rgba(255, 255, 240, 0.72) !important;
+}
+
+.auth-page {
+  background: rgba(242, 248, 243, 0.82) !important;
+}
+
+/* HOME HERO */
 .home-page .hero {
   position: relative !important;
   z-index: 1 !important;
   background: linear-gradient(
     135deg,
-    rgba(255,255,240,.72),
-    rgba(255,255,255,.68)
+    rgba(255, 255, 240, 0.72),
+    rgba(255, 255, 255, 0.68)
   ) !important;
 }
 
-/* Keep the navigation clean and solid. */
+/* Keep navigation clean and above the animation. */
 .home-page .navbar,
 .navbar {
   position: relative !important;
   z-index: 5 !important;
-  background: rgba(255,255,255,.96) !important;
+  background: rgba(255, 255, 255, 0.96) !important;
 }
 
-/* Keep the main content crisp above the animation. */
+/* Keep main hero content readable. */
 .home-page .hero-content,
 .home-page .hero-card {
-  position: relative;
-  z-index: 3;
+  position: relative !important;
+  z-index: 3 !important;
 }
 
-/* Make the lower home sections translucent too. */
+/* Lower home sections remain slightly transparent. */
 .home-page .features-section {
-  position: relative;
-  z-index: 1;
-  background: rgba(255,255,255,.78) !important;
+  position: relative !important;
+  z-index: 1 !important;
+  background: rgba(255, 255, 255, 0.78) !important;
 }
 
 .home-page .about-section {
-  position: relative;
-  z-index: 1;
-  background: rgba(241,248,242,.80) !important;
+  position: relative !important;
+  z-index: 1 !important;
+  background: rgba(241, 248, 242, 0.80) !important;
 }
 
-/* Cards stay solid so the animation does not interfere with readability. */
+/* Keep cards solid and readable above the animation. */
 .hero-card,
 .feature-card,
 .auth-card,
@@ -94,18 +113,18 @@
 .success-card,
 .profile-card,
 .camera-card {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+/* Buttons and interactive elements stay above everything. */
+button,
+a,
+input,
+select,
+textarea {
   position: relative;
-  z-index: 3;
-}
-
-/* Other application pages: let the animation show through their
-   large page background while keeping cards readable. */
-.app-page {
-  background: rgba(255,255,240,.72) !important;
-}
-
-.auth-page {
-  background: rgba(242,248,243,.82) !important;
+  z-index: 4;
 }
 
 /* Never allow the animation to capture clicks/touches. */
@@ -114,7 +133,7 @@
   pointer-events: none !important;
 }
 
-/* Make the actual animated elements visible above translucent surfaces. */
+/* Force the actual animated pieces to remain visible. */
 .farming-motion .farming-orb,
 .farming-motion .farm-horizon,
 .farming-motion .farm-float,
@@ -122,4 +141,11 @@
 .farming-motion .firefly-field,
 .farming-motion .farm-particle {
   visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Prevent common parent rules from hiding the animation. */
+.farming-motion[aria-hidden="true"] {
+  visibility: visible !important;
+  opacity: 1 !important;
 }
